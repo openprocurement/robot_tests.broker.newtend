@@ -43,6 +43,23 @@ ${locator.view.value.amount}         id=view-tender-value
 ${locator.view.minimalStep.amount}   id=step
 ${locator.view.tenderPeriod.startDate}      id=start-date-registration
 ${locator.view.tenderPeriod.endDate}        id=end-date-registration
+${locator.view.enquiryPeriod.StartDate}     id=start-date-qualification
+${locator.view.enquiryPeriod.endDate}       id=end-date-qualification
+${locator.view.items[0].deliveryDate.endDate}   id=end-date-delivery
+${locator.view.procuringEntity.name}        id=view-customer-name
+${locator.view.items[0].deliveryAddress}    id=deliveryAddress
+${locator.view.items[0].classification.scheme.title}   id=classifier
+${locator.view.items[0].classification.scheme}      id=classifier
+${locator.view.items[0].classification.scheme}      id=classifier
+${locator.view.QUESTIONS[0].title}          xpath=//span[@class="user ng-binding"]
+${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
+${locator.view.QUESTIONS[0].date}           xpath=//span[@class="date ng-binding"]
+${locator.view.items[0].unit.name}          xpath=//span[@class="unit ng-binding"]
+${locator.view.items[0].quantity}           id=quantity
+${locator.view.items[0].description}        id=view-item-description
+${locator.view.auctionId}                   xpath=//a[@class="ng-binding ng-scope"]
+
+
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -231,10 +248,10 @@ Set datetime
   Click element    xpath=//a[@ui-sref="tenderView.documents"]
   Wait until page contains element     xpath=//button[@ng-click="uploadDocument()"]     30
   Click element     xpath=//button[@ng-click="uploadDocument()"]
-  Click element     xpath=//select[@id="documentType"]
-  Run keyword if     '${ARGUMENTS[0]}' == 'Newtend_Owner'    select from list by index    xpath=//option[@value="notice"]
+  Select from list by index     xpath=//select[@id="documentType"]      2
+  Run keyword if     '${ARGUMENTS[0]}' == 'Newtend_Owner'    select from list by index   '2'  # xpath=//option[@value="notice"]
   Run keyword if     '${ARGUMENTS[0]}' == 'Provider'    click element     xpath=//option[@value="qualificationDocuments"]
-#  Click element     xpath=//button[@ng-model="file"]
+  Click element     xpath=//button[@ng-model="file"]
   Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Click element     xpath=//button[@ng-click="upload()"]
   sleep     3
@@ -322,8 +339,8 @@ Set datetime
   ${description}=   отримати текст із поля і показати на сторінці   description
   [return]  ${description}
 
-отримати інформацію про tenderId
-  ${tenderId}=   отримати текст із поля і показати на сторінці   tenderId
+отримати інформацію про auctionId
+  ${tenderId}=   отримати текст із поля і показати на сторінці   auctionId
   [return]  ${tenderId}
 
 отримати інформацію про value.amount
@@ -360,7 +377,8 @@ Set datetime
   [return]  ${procuringEntity_name}
 
 отримати інформацію про enquiryPeriod.endDate
-  ${enquiryPeriodEndDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.endDate
+  ${enquiryPeriodEndDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.endDate      3   -1
+  Log to console    ${enquiryPeriodEndDate}
   [return]  ${enquiryPeriodEndDate}
 
 отримати інформацію про tenderPeriod.startDate
@@ -382,6 +400,12 @@ Set datetime
 отримати інформацію про items[0].deliveryDate.endDate
   ${deliveryDate_endDate}=   отримати текст із поля і показати на сторінці   items[0].deliveryDate.endDate
   [return]  ${deliveryDate_endDate}
+
+Отримати інформацію про value.valueAddedTaxIncluded
+  ${return_value}=   Отримати текст із поля і показати на сторінці  value.amount
+  ${return_value}=   Remove String      ${return_value}    50 000,99 грн.
+  ${return_value}=   convert_nt_string_to_common_string      ${return_value}
+  [Return]  ${return_value}
 
 отримати інформацію про items[0].deliveryLocation.latitude
   Fail  Не реалізований функціонал
@@ -411,7 +435,7 @@ Set datetime
   ${Delivery_Address}=   Get Substring   ${Delivery_Address}=    0   -2
   [return]  ${Delivery_Address.split(', ')[4]}
 
-##CPV
+##CAV
 отримати інформацію про items[0].classification.scheme
   ${classificationScheme}=   отримати текст із поля і показати на сторінці   items[0].classification.scheme.title
   [return]  ${classificationScheme.split(' ')[1]}
@@ -422,7 +446,7 @@ Set datetime
 
 отримати інформацію про items[0].classification.description
   ${classification_description}=   отримати текст із поля і показати на сторінці   items[0].classification.scheme
-  Run Keyword And Return If  '${classification_description}' == '44617100-9 - Картонки'   Convert To String   Cartons
+  Run Keyword And Return If  '${classification_description}' == '66113000-5 - Права вимоги'   Convert To String   Права вимоги
   [return]  ${classification_description}
 
 ##ДКПП
@@ -513,6 +537,7 @@ Set datetime
 #  Wait Until Page Contains   ${ARGUMENTS[1]}   20
 
 отримати інформацію про QUESTIONS[0].title
+  reload page
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   Wait Until Page Contains   Вы не можете задавать вопросы    20
   ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].title
@@ -589,9 +614,13 @@ Change_day_to_month
     ...    ${ARGUMENTS[2]} ==  amount
     ...    ${ARGUMENTS[3]} ==  amount.value
 #    Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+    reload page
+    sleep   2
     Click Element           xpath=//button[@ng-click="placeBid()"]
     Clear Element Text      xpath=//input[@name="amount"]
     Input Text              xpath=//input[@name="amount"]         ${ARGUMENTS[3]}
+    ${agree}=   Get Matching Xpath Count     xpath=//input[@name="agree"]
+    run keyword if  '${agree}' == '1'     Click element   xpath=//input[@name="agree"]
     sleep   3
     Click Element       xpath=//button[@ng-click="changeBid()"]
 
@@ -612,7 +641,6 @@ Change_day_to_month
   Click element     xpath=//textarea[@ng-model="chatData.message"]
   Input text        xpath=//textarea[@ng-model="chatData.message"]      ${answer}
   click element     xpath=//button[@ng-click="sendAnswer()"]
-  reload page
   sleep     2
   reload page
 

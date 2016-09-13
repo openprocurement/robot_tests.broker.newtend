@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from iso8601 import parse_date
 from op_robot_tests.tests_files.service_keywords import get_now
@@ -18,5 +19,18 @@ def newtend_date_picker_index(isodate):
 
 
 def update_data_for_newtend(tender_data):
-    tender_data.data.procuringEntity['name'] = u"openprocurement"
+    tender_data.data.procuringEntity['name'] = u"Auction Owner company"
     return tender_data
+
+
+def convert_nt_string_to_common_string(string):
+    return {
+        u"кілограми": u"кілограм",
+        u"кг.": u"кілограми",
+        u"грн.": u"UAH",
+        u" з ПДВ": True,
+        u"Картонки": u"Картонні коробки",
+        u"Уточнение": u"active.enquiries",
+        u"Предложения": u"active.tendering",
+        u"Аукцион": u"active.auction",
+    }.get(string, string)

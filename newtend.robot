@@ -628,4 +628,4 @@ Change_day_to_month
   Click element       xpath=//button[@ng-model="file"]
   sleep     3
   Choose file         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
-  Click file         xpath=//button[@ng-click="upload()"]
+  Click element       xpath=//button[@ng-click="upload()"]

@@ -28,7 +28,7 @@ def convert_nt_string_to_common_string(string):
         u"кілограми": u"кілограм",
         u"кг.": u"кілограми",
         u"грн.": u"UAH",
-        u" з ПДВ": True,
+        u"c НДС": True,
         u"Картонки": u"Картонні коробки",
         u"Уточнение": u"active.enquiries",
         u"Предложения": u"active.tendering",

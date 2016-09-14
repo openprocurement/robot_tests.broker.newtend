@@ -48,16 +48,18 @@ ${locator.view.enquiryPeriod.endDate}       id=end-date-qualification
 ${locator.view.items[0].deliveryDate.endDate}   id=end-date-delivery
 ${locator.view.procuringEntity.name}        id=view-customer-name
 ${locator.view.items[0].deliveryAddress}    id=deliveryAddress
-${locator.view.items[0].classification.scheme.title}   id=classifier
-${locator.view.items[0].classification.scheme}      id=classifier
-${locator.view.items[0].classification.scheme}      id=classifier
+${locator.view.items[0].classification.scheme.title}   id=classifier-0
+${locator.view.items[0].classification.scheme}      id=classifier-0
+${locator.view.items[0].classification.id}      xpath=//label[@for="classifier-0"]
 ${locator.view.QUESTIONS[0].title}          xpath=//span[@class="user ng-binding"]
 ${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
 ${locator.view.QUESTIONS[0].date}           xpath=//span[@class="date ng-binding"]
 ${locator.view.items[0].unit.name}          xpath=//span[@class="unit ng-binding"]
-${locator.view.items[0].quantity}           id=quantity
-${locator.view.items[0].description}        id=view-item-description
+${locator.view.items[0].quantity}           id=quantity-0
+${locator.view.items[0].description}        id=view-item-description-0
 ${locator.view.auctionId}                   xpath=//a[@class="ng-binding ng-scope"]
+${locator.view.value.valueAddedTaxIncluded}         xpath=//label[@for="with-nds"]
+${locator.view.value.currency}              xpath=//label[@for="budget"]
 
 
 
@@ -199,13 +201,13 @@ Login
   log to console  ${TENDER_UAID}
   [return]  ${TENDER_UAID}
 
-Set Multi Ids
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  ${tender_UAid}
-  ${current_location}=      Get Location
-  ${id}=    Get Substring   ${current_location}   -41   -9
-  ${Ids}=   Create List     ${tender_UAid}   ${id}
+#Set Multi Ids
+#  [Arguments]  @{ARGUMENTS}
+#  [Documentation]
+#  ...      ${ARGUMENTS[0]} ==  ${tender_UAid}
+#  ${current_location}=      Get Location
+#  ${id}=    Get Substring   ${current_location}   -41   -9
+#  ${Ids}=   Create List     ${tender_UAid}   ${id}
 
 Set datetime
   [Arguments]  @{ARGUMENTS}
@@ -236,27 +238,49 @@ Set datetime
   : FOR    ${INDEX}    IN RANGE    1    ${Items_length}
   \   Click Element   ${locator.edit.add_item}
   \   Додати придмет   ${items[${INDEX}]}   ${INDEX}
+# SlaOne's method for file upload
+#Завантажити документ
+#  [Arguments]  @{ARGUMENTS}
+#  [Documentation]
+#  ...      ${ARGUMENTS[0]} ==  username
+#  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+#  ...      ${ARGUMENTS[2]} ==  ${filepath}
+#  # For tender owner docs uploading
+##  run keyword if  '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click element    xpath=//a[@ui-sref="tenderView.documents"]
+#  Click element    xpath=//a[@ui-sref="tenderView.documents"]
+#  Wait until page contains element     xpath=//button[@ng-click="uploadDocument()"]     30
+#  Click element     xpath=//button[@ng-click="uploadDocument()"]
+#  Select from list by index     xpath=//select[@id="documentType"]      2
+#  Run keyword if     '${ARGUMENTS[0]}' == 'Newtend_Owner'    select from list by index   '2'  # xpath=//option[@value="notice"]
+#  Run keyword if     '${ARGUMENTS[0]}' == 'Provider'    click element     xpath=//option[@value="qualificationDocuments"]
+#  Click element     xpath=//button[@ng-model="file"]
+#  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+#  Click element     xpath=//button[@ng-click="upload()"]
+#  sleep     3
+#  Reload page
 
 Завантажити документ
   [Arguments]  @{ARGUMENTS}
   [Documentation]
   ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  ...      ${ARGUMENTS[2]} ==  ${filepath}
-  # For tender owner docs uploading
-#  run keyword if  '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click element    xpath=//a[@ui-sref="tenderView.documents"]
+  ...      ${ARGUMENTS[1]} ==  ${filepath}
+  ...      ${ARGUMENTS[2]} ==  ${TENDER_UAID}
+   # For tender owner docs uploading
+ #  run keyword if  '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click element    xpath=//a[@ui-sref="tenderView.documents"]
   Click element    xpath=//a[@ui-sref="tenderView.documents"]
   Wait until page contains element     xpath=//button[@ng-click="uploadDocument()"]     30
   Click element     xpath=//button[@ng-click="uploadDocument()"]
   Select from list by index     xpath=//select[@id="documentType"]      2
-  Run keyword if     '${ARGUMENTS[0]}' == 'Newtend_Owner'    select from list by index   '2'  # xpath=//option[@value="notice"]
+#-  Run keyword if     '${ARGUMENTS[0]}' == 'Newtend_Owner'    select from list by index   '2'  # xpath=//option[@value="notice"]
+# Run keyword if     '${ARGUMENTS[0]}' == 'Newtend_Owner'    select from list by index   '2'  # xpath=//option[@value="notice"]
   Run keyword if     '${ARGUMENTS[0]}' == 'Provider'    click element     xpath=//option[@value="qualificationDocuments"]
-  Click element     xpath=//button[@ng-model="file"]
-  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+#-  Click element     xpath=//button[@ng-model="file"]
+#-  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+  Execute Javascript  $('button[ng-model="file"]').click()
+  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
   Click element     xpath=//button[@ng-click="upload()"]
   sleep     3
   Reload page
-
 Подати скаргу
   [Arguments]  @{ARGUMENTS}
   [Documentation]
@@ -353,6 +377,12 @@ Set datetime
   ${minimalStepAmount}=   Convert To Number   ${minimalStepAmount.split(' ')[0]}
   [return]  ${minimalStepAmount}
 
+Отримати інформацію про value.currency
+  ${valueCurrency}=       отримати текст із поля і показати на сторінці    value.currency     #  xpath=//label[@for="budget"]
+  ${valueCurrency}=       Get Substring     ${valueCurrency}    -4      -1
+  log to console    ${valueCurrency}
+  [return]   ${valueCurrency}
+
 Внести зміни в тендер
   [Arguments]  @{ARGUMENTS}
   [Documentation]
@@ -377,7 +407,8 @@ Set datetime
   [return]  ${procuringEntity_name}
 
 отримати інформацію про enquiryPeriod.endDate
-  ${enquiryPeriodEndDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.endDate      3   -1
+  ${enquiryPeriodEndDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.endDate
+  ${enquiryPeriodEndDate}=   Get Substring      ${enquiryPeriodEndDate}     3
   Log to console    ${enquiryPeriodEndDate}
   [return]  ${enquiryPeriodEndDate}
 
@@ -401,10 +432,11 @@ Set datetime
   ${deliveryDate_endDate}=   отримати текст із поля і показати на сторінці   items[0].deliveryDate.endDate
   [return]  ${deliveryDate_endDate}
 
+# NDS
 Отримати інформацію про value.valueAddedTaxIncluded
-  ${return_value}=   Отримати текст із поля і показати на сторінці  value.amount
-  ${return_value}=   Remove String      ${return_value}    50 000,99 грн.
+  ${return_value}=   Отримати текст із поля і показати на сторінці   value.valueAddedTaxIncluded       #  xpath=//label[@for="with-nds"]
   ${return_value}=   convert_nt_string_to_common_string      ${return_value}
+  log to console        ${return_value}
   [Return]  ${return_value}
 
 отримати інформацію про items[0].deliveryLocation.latitude
@@ -437,8 +469,11 @@ Set datetime
 
 ##CAV
 отримати інформацію про items[0].classification.scheme
-  ${classificationScheme}=   отримати текст із поля і показати на сторінці   items[0].classification.scheme.title
-  [return]  ${classificationScheme.split(' ')[1]}
+  ${classificationScheme}=   отримати текст із поля і показати на сторінці     items[0].classification.id
+  ${classificationScheme}=   Get substring     ${classificationScheme}      -3
+  log to console    ${classificationScheme}
+  [return]  ${classificationScheme}
+#  [return]  ${classificationScheme.split(' ')[1]}
 
 отримати інформацію про items[0].classification.id
   ${classification_id}=   отримати текст із поля і показати на сторінці   items[0].classification.scheme
@@ -532,26 +567,32 @@ Set datetime
   [Documentation]
   ...      ${ARGUMENTS[0]} = username
 #  ...      ${ARGUMENTS[1]} = ${TENDER_UAID}
-  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+#  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   Reload Page
 #  Wait Until Page Contains   ${ARGUMENTS[1]}   20
-
+# information
 отримати інформацію про QUESTIONS[0].title
   reload page
+  sleep     3
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
-  Wait Until Page Contains   Вы не можете задавать вопросы    20
+  sleep     3
+#  Wait Until Page Contains   Вы не можете задавать вопросы    20
   ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].title
   [return]  ${resp}
 
 отримати інформацію про QUESTIONS[0].description
+  sleep     3
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].description
   [return]  ${resp}
 
 отримати інформацію про QUESTIONS[0].date
+  sleep     3
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].date
   ${resp}=   Change_day_to_month   ${resp}
   [return]  ${resp}
-
+# question info
 Отримати інформацію про questions[0].answer
   Click Element                       xpath=//a[@ui-sref="tenderView.chat"]
   reload page
@@ -622,6 +663,7 @@ Change_day_to_month
     ${agree}=   Get Matching Xpath Count     xpath=//input[@name="agree"]
     run keyword if  '${agree}' == '1'     Click element   xpath=//input[@name="agree"]
     sleep   3
+    Mouse over          xpath=//button[@ng-click="changeBid()"]
     Click Element       xpath=//button[@ng-click="changeBid()"]
 
 
@@ -650,10 +692,83 @@ Change_day_to_month
   [Documentation]
   ...    ${ARGUMENTS[1]} ==  file
   ...    ${ARGUMENTS[2]} ==  tenderId
+  reload page
+  sleep     2
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait until page contains element    xpath=//button[@ng-click="uploadDocument()"]
   Click element       xpath=//button[@ng-click="uploadDocument()"]
-  Click element       xpath=//button[@ng-model="file"]
   sleep     3
-  Choose file         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
-  Click element       xpath=//button[@ng-click="upload()"]
+  Select from list by index     xpath=//select[@id="documentType"]      2
+  Execute Javascript  $('button[ng-model="file"]').click()
+  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Click element     xpath=//button[@ng-click="upload()"]
+  sleep     3
+  Reload page
+
+
+Змінити документ в ставці
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...    ${ARGUMENTS[0]} ==  username
+  ...    ${ARGUMENTS[1]} ==  file
+  ...    ${ARGUMENTS[2]} ==  tenderId
+#  reload page
+#  sleep     2
+#  Click element     xpath=//a[@ui-sref="tenderView.documents"]
+#  Wait until page contains element      xpath=//a[@ng-model="$parent.$parent.replaceFiles"]     10
+#  Execute Javascript  $('a[ng-model="$parent.$parent.replaceFiles"]').click()
+#  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+##  Click element     xpath=//button[@ng-click="upload()"]
+#  sleep     3
+#  Reload page
+  reload page
+  sleep     2
+  Click Element       xpath=//a[@ui-sref="tenderView.documents"]
+  Wait until page contains element    xpath=//button[@ng-click="uploadDocument()"]
+  Click element       xpath=//button[@ng-click="uploadDocument()"]
+  sleep     3
+  Select from list by index     xpath=//select[@id="documentType"]      2
+  Execute Javascript  $('button[ng-model="file"]').click()
+  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Click element     xpath=//button[@ng-click="upload()"]
+  sleep     3
+  Reload page
+
+
+
+
+Отримати посилання на аукціон для глядача
+  [Arguments]  @{ARGUMENTS}
+  reload page
+  sleep     3
+  reload page
+  Click element     xpath=//a[@ui-sref="tenderView.auction"]
+  sleep     3
+  : FOR   ${INDEX}   IN RANGE    1    60
+  \   reload page
+  \   Log To Console   .   no_newline=true
+  \   sleep     15
+  \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
+  \   Exit For Loop If   '${count}' == '1'
+  Wait until page contains element      xpath=//a[@class="auction-link ng-binding"]     10
+  ${result} =    Get Element Attribute  xpath=//a[@target="_blank"]@href
+  log to console    ${result}
+  [Return]   ${result}
+
+
+Отримати посилання на аукціон для учасника
+  [Arguments]  @{ARGUMENTS}
+  reload page
+  sleep     2
+  Click element     xpath=//a[@ui-sref="tenderView.overview"]
+  sleep     3
+  : FOR   ${INDEX}   IN RANGE    1    60
+  \   reload page
+  \   Log To Console   .   no_newline=true
+  \   sleep     15
+  \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
+  \   Exit For Loop If   '${count}' == '1'
+  Wait until page contains element      xpath=//a[@class="auction-link ng-binding"]     10
+  ${result} =    Get Element Attribute   xpath=//a[@target="_blank"]@href
+  log to console    ${result}
+  [Return]   ${result}

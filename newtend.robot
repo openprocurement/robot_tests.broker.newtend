@@ -127,18 +127,18 @@ Login
   Click Element     id=with-nds
 
 # Moving to Lot's modal
-  Click Element     ${locator.lot.add}
-  Input text        ${locator.lot.name}            Lot name
-  Input text        ${locator.lot.description}     Lot description
+#  Click Element     ${locator.lot.add}
+#  Input text        ${locator.lot.name}            Lot name
+#  Input text        ${locator.lot.description}     Lot description
   ${budget}         convert to string       ${budget}
-  Input text        ${locator.lot.value}       ${budget}
+  Input text        ${locator.value.amount}       ${budget}
   ${step_rate}      convert to string       ${step_rate}
-  Input text        ${locator.lot.step}     ${step_rate}
-  Click Element     ${locator.lot.confirm.btn}
-
-  # Selecting related lot
-  Click Element     xpath=//select[@ng-model="item.relatedLot"]
-  Click Element     xpath=//option[@label='Lot name']
+  Input text        ${locator.minimalStep.amount}     ${step_rate}
+#  Click Element     ${locator.lot.confirm.btn}
+#
+#  # Selecting related lot
+#  Click Element     xpath=//select[@ng-model="item.relatedLot"]
+#  Click Element     xpath=//option[@label='Lot name']
 
 
   # Filling Items fields
@@ -743,7 +743,7 @@ Change_day_to_month
   sleep     3
   reload page
   Click element     xpath=//a[@ui-sref="tenderView.auction"]
-  sleep     3
+  sleep     240
   : FOR   ${INDEX}   IN RANGE    1    60
   \   reload page
   \   Log To Console   .   no_newline=true
@@ -761,7 +761,7 @@ Change_day_to_month
   reload page
   sleep     2
   Click element     xpath=//a[@ui-sref="tenderView.overview"]
-  sleep     3
+  sleep     360
   : FOR   ${INDEX}   IN RANGE    1    60
   \   reload page
   \   Log To Console   .   no_newline=true

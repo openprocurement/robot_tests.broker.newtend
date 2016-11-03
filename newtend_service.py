@@ -5,50 +5,6 @@ from iso8601 import parse_date
 from op_robot_tests.tests_files.service_keywords import get_now
 from calendar import monthrange
 
-'''
-# Robot tests parallel execution
-# Output files are going to be written into certain Log file
-# DGF Financial assets
-# Newtend Auction Owner ================
-# bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
-# bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
-# bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
-# bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
-# ======================================
-# Newtend provider =====================
-# bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
-# bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
-# bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
-# bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
-# ======================================
-# Newtend viewer =======================
-# bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
-# bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
-# bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
-# bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
-# ======================================
-
-# DGF Other assets
-# Newtend Auction Owner ================
-bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
-bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
-bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
-bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
-# ======================================
-# Newtend provider =====================
-bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
-bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
-bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
-bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
-# ======================================
-# Newtend viewer =======================
-bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_procedure
-bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_auction
-bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_qualify
-bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_contract
-# ======================================
-'''
-
 
 def newtend_date_picker_index(isodate):
     now = get_now()
@@ -62,14 +18,11 @@ def newtend_date_picker_index(isodate):
 
 
 def update_data_for_newtend(tender_data):
-    # tender_data.data.procuringEntity.name = u"Bank fool name"
     tender_data.data.procuringEntity['name'] = u"Bank fool name"
-    # tender_data['data']['procuringEntity']['name'] = u"Bank fool name"
     return tender_data
 
 
 def update_data_for_newtend_new(role_name, tender_data):
-    # if role_name == 'tender_owner':
     if role_name == 'tender_owner':
         tender_data['data']['procuringEntity']['name'] = u"Bank fool name"
     return tender_data

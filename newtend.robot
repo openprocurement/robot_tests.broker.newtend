@@ -299,8 +299,6 @@ Login
 # Name of auction creator
 отримати інформацію про procuringEntity.name
   ${procuringEntity_name}=   отримати текст із поля і показати на сторінці   procuringEntity.name
-  ${procuringEntity_name}=  Set Variable If  '${username}' == 'Newtend_Owner'  update_data_for_newtend   ${procuringEntity_name}
-  log to console  ${username}
   log to console  ${procuringEntity_name}
   [return]  ${procuringEntity_name}
 

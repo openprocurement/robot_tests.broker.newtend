@@ -371,9 +371,9 @@ Login
 отримати інформацію із classification.description
 #  Відображення опису класифікації номенклатур тендера
   ${classification_description_raw}=   переглянути текст із поля і показати на сторінці   items[0].classification.scheme
-  ${classification_description}=       convert_nt_string_to_common_string      ${classification_description_raw.split(' - ')[-1]}
-  Log To Console  ${classification_description.split(' - ')[-1]}
-  [Return]  ${classification_description.split(' - ')[-1]}
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
+  Log To Console        ${classification_description}
+  [Return]      ${classification_description}
 
 ##item
 отримати інформацію із unit.name

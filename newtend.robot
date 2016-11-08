@@ -200,6 +200,8 @@ Login
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${Complain}
   Fail   Тест не написаний
+  # === Mega Hack for document Upload ===
+  # Execute Javascript  $('button[ng-model="file"]').click()
 
 Подати скаргу
   [Arguments]  @{ARGUMENTS}
@@ -528,7 +530,8 @@ Login
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
-  Click Element       xpath=//button[@ng-model="file"]
+  Execute Javascript  $('button[ng-model="file"]').click()
+#  Click Element       xpath=//button[@ng-model="file"]
   Sleep     3
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
   Click Element       xpath=//button[@ng-click="upload()"]
@@ -659,12 +662,13 @@ Change_day_to_month
   Wait Until Page Contains Element     xpath=//form[@name="cancelTenderForm"]
   Input Text    xpath=//textarea[@name="comment"]   ${ARGUMENTS[2]}
   # Document attach
-  Click Element     xpath=//span[@class="attach-title ng-binding"]
+  # Mega Hack for documents Upload
+  Execute Javascript  $('span[class="attach-title ng-binding"]').click()
   Sleep     3
   Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[3]}
   Sleep     3
   Click Element     xpath=//div[@ng-click="delete()"]
-  Sleep     3
+  Sleep     15
   Reload Page
   Sleep     30
   Reload Page

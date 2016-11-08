@@ -58,6 +58,8 @@ ${locator.view.auctionId}                   xpath=//a[@class="ng-binding ng-scop
 ${locator.view.value.valueAddedTaxIncluded}         xpath=//label[@for="with-nds"]
 ${locator.view.value.currency}              xpath=//label[@for="budget"]
 ${locator.view.auctionPeriod.startDate}     xpath=//div[@class="ng-binding"]    # Date and time of auction Trade tab
+${locator.view.cancellations[0].status}     xpath=//h4[@class="ng-binding"]
+${locator.view.documents.title}             xpath=//a[@class="ng-binding"]
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -125,8 +127,8 @@ Login
   Wait Until Page Contains Element   xpath=//a[@ui-sref="createTender"]   100
   Click Link                         xpath=//a[@ui-sref="createTender"]
 # Selecting DGF Financial asset or DGF Other assets
-  Run Keyword If   '${mode}' == 'dgfFinancialAssets'    select from list by value     xpath=//select[@id="tenderProcedure"]       dgfFinancialAssets
-  Run Keyword If   '${mode}' == 'dgfOtherAssets'    select from list by value     xpath=//select[@id="tenderProcedure"]       dgfOtherAssets
+  Run Keyword If  '${mode}' == 'dgfFinancialAssets'  select from list by value   xpath=//select[@id="tenderProcedure"]   dgfFinancialAssets
+  Run Keyword If  '${mode}' == 'dgfOtherAssets'    select from list by value     xpath=//select[@id="tenderProcedure"]   dgfOtherAssets
   Click Element     id=attach-docs-btn
 
   Log To Console    Selecting Some procedure ${mode}
@@ -198,6 +200,8 @@ Login
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${Complain}
   Fail   Тест не написаний
+  # === Mega Hack for document Upload ===
+  # Execute Javascript  $('button[ng-model="file"]').click()
 
 Подати скаргу
   [Arguments]  @{ARGUMENTS}
@@ -229,7 +233,7 @@ Login
   Click Element     xpath=//div[@ng-click="search()"]
   Sleep     2
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]   10
-  Sleep   2
+  Sleep     2
   Click Element                      xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]
 
 # ====Newtend===========
@@ -244,7 +248,7 @@ Login
 
 отримати текст із поля і показати на сторінці
   [Arguments]   ${field_name}
-  Sleep  1
+  Sleep  2
   ${return_value}=   Get Text  ${locator.view.${field_name}}
   [Return]  ${return_value}
 
@@ -467,7 +471,7 @@ Login
   \   ${count}=   Get Matching Xpath Count   xpath=//button[@ng-click="placeBid()"]
   \   Exit For Loop If   '${count}' == '1'
   Click Element     xpath=//button[@ng-click="placeBid()"]
-  ${amount_bid}=    convert to integer  ${amount}
+  ${amount_bid}=    Convert To Integer                 ${amount}
   Clear Element Text  xpath=//input[@name="amount"]
   Input Text          xpath=//input[@name="amount"]    ${amount_bid}
   Click Element       xpath=//input[@name="agree"]
@@ -475,7 +479,7 @@ Login
   Sleep   3
   Reload Page
   Wait Until Page Contains Element      xpath=//div[@class="bid-placed make-bid ng-scope"]
-  ${resp}=   Get text    xpath=//h3[@class="ng-binding"]
+  ${resp}=     Get text    xpath=//h3[@class="ng-binding"]
   [Return]     ${resp}
 
 
@@ -492,11 +496,11 @@ Login
   [Arguments]  @{ARGUMENTS}
   [Documentation]
   ...      ${ARGUMENTS[0]} == username
-  ${value_raw}=     get text   xpath=//h3[@title=""]
+  ${value_raw}=     Get Text   xpath=//h3[@title=""]
   Log To Console    ${value_raw}
-  ${value_num}=     get substring  ${value_raw}  0   -4
+  ${value_num}=     Get Substring  ${value_raw}  0   -4
   Log To Console    ${value_num}
-  ${value}=         convert to integer  ${value_num}
+  ${value}=         Convert To Integer  ${value_num}
   [Return]  ${value}
 
 Змінити цінову пропозицію
@@ -510,7 +514,7 @@ Login
     Sleep   2
     Click Element           xpath=//button[@ng-click="placeBid()"]
     Clear Element Text      xpath=//input[@name="amount"]
-    ${updated_bid}=     convert to integer   ${ARGUMENTS[3]}
+    ${updated_bid}=     Convert To Integer   ${ARGUMENTS[3]}
     Log To Console      Updatetd bid amount - ${updated_bid}
     Input Text          xpath=//input[@name="amount"]         ${updated_bid}
     Sleep   3
@@ -526,7 +530,8 @@ Login
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
-  Click Element       xpath=//button[@ng-model="file"]
+  Execute Javascript  $('button[ng-model="file"]').click()
+#  Click Element       xpath=//button[@ng-model="file"]
   Sleep     3
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
   Click Element       xpath=//button[@ng-click="upload()"]
@@ -543,10 +548,10 @@ Login
   \   Log To Console   .   no_newline=true
   \   sleep     30
   \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
-  \   ${link}=    get element attribute      xpath=//a[@target="_blank"]@href
+  \   ${link}=    Get Element Attribute      xpath=//a[@target="_blank"]@href
   \   Exit For Loop If   '${count}' == '1' and '${link}' != 'None'
   Wait Until Page Contains Element      xpath=//a[@class="auction-link ng-binding"]     10
-  ${result}=    Get Element Attribute  xpath=//a[@target="_blank"]@href
+  ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
   ${result}=    Convert To String  ${result}
   Log To Console    ${result}
   [Return]  ${result}
@@ -563,7 +568,7 @@ Login
   \   Log To Console   .   no_newline=true
   \   sleep     30
   \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
-  \   ${link}=    get element attribute      xpath=//a[@target="_blank"]@href
+  \   ${link}=    Get Element Attribute      xpath=//a[@target="_blank"]@href
   \   Exit For Loop If   '${count}' == '1' and '${link}' != 'None'
   Wait Until Page Contains Element      xpath=//a[@class="auction-link ng-binding"]     10
   ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
@@ -625,3 +630,74 @@ Change_day_to_month
   Input Text   id=contractNumber    Contruct signed
   Click Element  xpath=//button[@ng-click="closeBids()"]
   Log To Console    Its Ok - contract signed
+
+
+# ===========================================
+#           Auction Cancelation
+# ===========================================
+Скасувати закупівлю
+  [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} == 'username'
+  ...      ${ARGUMENTS[1]} == 'auction_uaid'
+  ...      ${ARGUMENTS[2]} == 'cancellation_reason'
+  ...      ${ARGUMENTS[3]} == '[document][doc_path]'
+  ...      ${ARGUMENTS[4]} == 'description'
+  # Looking for Auction
+  Log To Console   Searching for canceled UFOs - ${ARGUMENTS[1]}
+  Switch browser   ${ARGUMENTS[0]}
+  Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   click element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
+  Sleep     2
+  ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
+  Input Text        xpath=//input[@type="search"]     ${auction_number}
+  Click Element     xpath=//div[@ng-click="search()"]
+  Sleep     2
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]   10
+  Sleep   2
+  Click Element                      xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]
+  # Looking for cancell btn
+  Sleep     2
+  Click Element     xpath=//button[@id="cancel-tender-btn"]
+  sleep     2
+  Wait Until Page Contains Element     xpath=//form[@name="cancelTenderForm"]
+  Input Text    xpath=//textarea[@name="comment"]   ${ARGUMENTS[2]}
+  # Document attach
+  # Mega Hack for documents Upload
+  Execute Javascript  $('span[class="attach-title ng-binding"]').click()
+  Sleep     3
+  Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[3]}
+  Sleep     3
+  Click Element     xpath=//div[@ng-click="delete()"]
+  Sleep     15
+  Reload Page
+  Sleep     30
+  Reload Page
+  Click Element     xpath=//a[@ui-sref="tenderView.auction"]       # Navigating to see cancellation reason
+  Sleep     3
+
+
+Отримати інформацію про cancellations[0].status
+  Reload Page
+  Click Element     xpath=//a[@ui-sref="tenderView.auction"]       # Navigating to see cancellation reason
+  Sleep     3
+  ${return_value}=   отримати текст із поля і показати на сторінці  cancellations[0].status
+  ${return_value}=   convert_Nt_String_To_Common_String     ${return_value}
+  Log To Console     Auction date - ${return_value}
+  [Return]      ${return_value}
+
+
+Отримати інформацію про cancellations[0].reason
+  ${raw_text}=      Get Webelements     xpath=//div[@class="col-xs-9 ng-binding"]
+  ${text}=          Get Text         ${raw_text[-1]}
+  Log To Console    ${text}
+  [Return]          ${text}
+
+
+Отримати інформацію із документа    # Document Title
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
+  ${doc_title}=     Get WebElements    xpath=//a[@class="ng-binding"]
+  ${title}=         Get Text           ${doc_title[-1]}
+  Log To Console    ${title}
+  [Return]  ${title}
+
+# ================== Auction Cancellation =================

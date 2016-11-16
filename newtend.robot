@@ -60,6 +60,8 @@ ${locator.view.value.currency}              xpath=//label[@for="budget"]
 ${locator.view.auctionPeriod.startDate}     xpath=//div[@class="ng-binding"]    # Date and time of auction Trade tab
 ${locator.view.cancellations[0].status}     xpath=//h4[@class="ng-binding"]
 ${locator.view.documents.title}             xpath=//a[@class="ng-binding"]
+${locator.view.eligibilityCriteria}         id=eligibility-criteria    # eligibility Criteria field show
+${locator.answer_raw}                       xpath=//div[@class="row question-container"]
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -193,15 +195,90 @@ Login
   \   Click Element    ${locator.edit.add_item}
   \   Додати придмет   ${items[${INDEX}]}   ${INDEX}
 
+# ===================================
+#       Docs Upload
+# ===================================
 Завантажити документ
   [Arguments]  @{ARGUMENTS}
   [Documentation]
   ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  ...      ${ARGUMENTS[2]} ==  ${Complain}
-  Fail   Тест не написаний
+  ...      ${ARGUMENTS[1]} ==  ${file_path}
+  ...      ${ARGUMENTS[2]} ==  ${TENDER_UAID}
+#  Fail   Тест не написаний
+  # Navigating to documents tab
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  # Interacting with document upload mechanism
+  Log To Console    'Interacting with documents modal window'
+  Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      notice
+  Sleep     2
+  Log To Console    'Inserting document'
   # === Mega Hack for document Upload ===
-  # Execute Javascript  $('button[ng-model="file"]').click()
+  Execute Javascript  $('button[ng-model="file"]').click()
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Sleep     2
+  # Confirm file Upload
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     10
+
+Завантажити ілюстрацію
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  ${image_path}
+  # Navigating to documents tab
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  # Interacting with document upload mechanism - Illustration
+  Log To Console    'Interacting with documents modal window - Illustation'
+  Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      illustration
+  Sleep     2
+  Log To Console    'Inserting document'
+  # === Mega Hack for document Upload ===
+  Execute Javascript  $('button[ng-model="file"]').click()
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+  Sleep     2
+  # Confirm file Upload
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     10
+
+Додати Virtual Data Room
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  ${vdr_link}
+  # Navigating to documents tab
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  # Interacting with document upload mechanism - Illustration
+  Log To Console    'Interacting with documents modal window - Illustation'
+  Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      virtualDataRoom
+  Sleep     2
+  Log To Console    'Inserting VDR'
+  Input Text    xpath=//input[@id="auction-vdr-url"]    ${ARGUMENTS[2]}
+  Input Text    xpath=//input[@id="auction-vdr-title"]  ${ARGUMENTS[2]}
+  # === Mega Hack for document Upload ===
+#  Execute Javascript  $('button[ng-model="file"]').click()
+#  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+#  Sleep     2
+  # Confirm file Upload
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     10
+# ======= Docs Upload ===============
 
 Подати скаргу
   [Arguments]  @{ARGUMENTS}
@@ -267,7 +344,6 @@ Login
   ${description}=   отримати текст із поля і показати на сторінці   description
   [Return]  ${description}
 
-# :TODO  - check for dgf field - seems ok
 отримати інформацію про dgfID
   ${description}=   отримати текст із поля і показати на сторінці   dgfID
   [Return]   ${description}
@@ -324,6 +400,12 @@ Login
 отримати інформацію про enquiryPeriod.startDate
   ${enquiryPeriodStartDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.StartDate
   [Return]  ${enquiryPeriodStartDate}
+
+# full scenario
+Отримати інформацію про eligibilityCriteria
+  ${eligibilityCriteria}=   отримати текст із поля і показати на сторінці   eligibilityCriteria
+  Log To Console            ${eligibilityCriteria}
+  [Return]  ${eligibilityCriteria}
 
 # Comperison of Item names fields
 Отримати інформацію із предмету
@@ -432,6 +514,13 @@ Login
   Click Element   xpath=//div[@ng-click="sendQuestion()"]
   Wait Until Page Contains    ${description}   20
 
+  # :TODO Not realized
+Задати запитання на тендер
+  Fail   Not realized
+  # :TODO Not realized
+Задати запитання на предмет
+  Fail   Not realized
+
 Оновити сторінку з тендером
   [Arguments]  @{ARGUMENTS}
   [Documentation]
@@ -440,21 +529,79 @@ Login
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   Reload Page
 
-отримати інформацію про QUESTIONS[0].title
-  Wait Until Page Contains Element   xpath=//span[contains(text(), "Уточнения")]   20
-  Click Element              xpath=//span[contains(text(), "Уточнения")]
-  Wait Until Page Contains   Вы не можете задавать вопросы    20
-  ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].title
+# ==========================
+# Questions interaction
+# ==========================
+
+Отримати інформацію із запитання
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  tender_uaid
+  ...      ${ARGUMENTS[2]} ==  item_id    # Something like this - q-e5b21059
+  ...      ${ARGUMENTS[3]} ==  field_name
+  Run Keyword And Return  Отримати інформацію про Questions.${ARGUMENTS[3]}
+  # :TODO Not realized - seems to be done
+Отримати інформацію про Questions.answer
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title[-1]}
+  Log To Console    ${resp}
   [Return]  ${resp}
 
-отримати інформацію про QUESTIONS[0].description
-  ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].description
+отримати інформацію про questions.title
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="user ng-binding"]
+  ${resp}=   Get Text   ${title[-1]}
+  Log To Console    ${resp}
   [Return]  ${resp}
 
-отримати інформацію про QUESTIONS[0].date
-  ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].date
-  ${resp}=   Change_day_to_month   ${resp}
+отримати інформацію про questions.description
+# ${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
+  ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
+  ${resp}=   Get Text   ${description[-1]}
+  Log To Console    ${resp}
   [Return]  ${resp}
+
+#отримати інформацію про QUESTIONS[0].date
+#  ${resp}=   отримати текст із поля і показати на сторінці   QUESTIONS[0].date
+#  ${resp}=   Change_day_to_month   ${resp}
+#  [Return]  ${resp}
+
+Відповісти на запитання
+   [Arguments]      @{ARGUMENTS}
+   [Documentation]
+   ...      ${ARGUMENTS[0]} == username
+   ...      ${ARGUMENTS[1]} == ${tender_uaid}
+   ...      ${ARGUMENTS[2]} == ${item_index} # smth strange
+   ...      ${ARGUMENTS[3]} == ${answer_id}
+   Reload Page
+   ${answer}=     Get From Dictionary  ${ARGUMENTS[2].data}  answer
+   Log to Console   ${answer}
+   Log to Console   argument 2 - ${ARGUMENTS[2]}
+   Click Element        xpath=//a[@ui-sref="tenderView.chat"]
+   Sleep    3
+   # Try to answer
+   ${answer_row}=   Get Webelements   xpath=//div[@ng-repeat="question in questions"]
+   Log To Console   ${answer_row[-1]}
+   Mouse Over       ${answer_row[-1]}    # should show answer btn
+   ${answer_round}=     Get Webelements     xpath=//div[@class="answer"]
+   Focus            ${answer_round[-1]}
+   Click Element    ${answer_round[-1]}
+   Sleep    2
+   Input Text       xpath=//textarea[@ng-model="chatData.message"]   ${answer}
+   Click Element    xpath=//button[@ng-click="sendAnswer()"]
+
+# =======================================
+#       Question interaction end
+# =======================================
 
 # === Bid Making === Works fine
 Подати цінову пропозицію
@@ -481,6 +628,13 @@ Login
   Wait Until Page Contains Element      xpath=//div[@class="bid-placed make-bid ng-scope"]
   ${resp}=     Get text    xpath=//h3[@class="ng-binding"]
   [Return]     ${resp}
+
+#```
+#Неможливість подати пропозицію першим учасником без кваліфікації      | FAIL |
+#Setup failed:
+#TypeError: can't subtract offset-naive and offset-aware datetimes
+#
+#```
 
 
 Скасувати цінову пропозицію
@@ -521,6 +675,23 @@ Login
     Click Element       xpath=//button[@ng-click="changeBid()"]
     Sleep   3
     Reload Page
+    # :TODO fin document - seems to be done
+Завантажити фінансову ліцензію
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...    ${ARGUMENTS[1]} ==  file
+  ...    ${ARGUMENTS[2]} ==  tenderId
+  Click Element       xpath=//a[@ui-sref="tenderView.documents"]
+  Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
+  Click Element       xpath=//button[@ng-click="uploadDocument()"]
+  Sleep     2
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      financialLicense
+  Sleep     2
+  Execute Javascript  $('button[ng-file-select=""]').click()
+  Sleep     3
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Click Element       xpath=//button[@ng-click="upload()"]
 
 Завантажити документ в ставку
   [Arguments]  @{ARGUMENTS}
@@ -530,11 +701,27 @@ Login
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
-  Execute Javascript  $('button[ng-model="file"]').click()
-#  Click Element       xpath=//button[@ng-model="file"]
+  Sleep     2
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      commercialProposal
+  Execute Javascript  $('button[ng-file-select=""]').click()
   Sleep     3
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
   Click Element       xpath=//button[@ng-click="upload()"]
+
+# :TODO Change document - seems to be done
+Змінити документ в ставці
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...    ${ARGUMENTS[1]} ==  file
+  ...    ${ARGUMENTS[2]} ==  tenderId
+  Click Element       xpath=//a[@ui-sref="tenderView.documents"]
+  Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
+  ${replaces}=      Get Webelements     xpath=//a[@ng-model="$parent.$parent.replaceFiles"]
+  Execute Javasript     ${replaces[1]}.click()
+  Sleep     2
+  Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Log To Console    Document changed
 # ==================
 # === Links for auction ===
 Отримати посилання на аукціон для глядача
@@ -607,6 +794,10 @@ Change_day_to_month
 Отримати інформацію про auctionPeriod.endDate
   Fail  На майданчику newtend не відображається поле Дата завершення аукціону
 
+# =====================
+#    Qualification
+# =====================
+
 Підтвердити постачальника
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   Sleep     2
@@ -631,6 +822,13 @@ Change_day_to_month
   Click Element  xpath=//button[@ng-click="closeBids()"]
   Log To Console    Its Ok - contract signed
 
+Отримати кількість документів в ставці
+  # :TODO realize this key word
+  Fail  Not realized
+
+# ======================
+# Qualification End
+# ======================
 
 # ===========================================
 #           Auction Cancelation
@@ -700,4 +898,4 @@ Change_day_to_month
   Log To Console    ${title}
   [Return]  ${title}
 
-# ================== Auction Cancellation =================
+# ========== Auction Cancellation ============

@@ -5,6 +5,96 @@ from iso8601 import parse_date
 from op_robot_tests.tests_files.service_keywords import get_now
 from calendar import monthrange
 
+'''
+# Robot tests parallel execution
+# Output files are going to be written into certain Log file
+# DGF Financial assets
+# Newtend Auction Owner ================
+# bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
+# bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
+# bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
+# bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_newtend_owner
+# ======================================
+# Newtend provider =====================
+# bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
+# bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
+# bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
+# bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_provider
+# ======================================
+# Newtend viewer =======================
+# bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
+# bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
+# bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
+# bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
+# ======================================
+
+# DGF Other assets
+# Newtend Auction Owner ================
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
+# ======================================
+# Newtend provider =====================
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:provider -L TRACE:INFO -d test_output_newtend_O_provider
+# ======================================
+# Newtend viewer =======================
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_procedure
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_auction
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_qualify
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_O_viewer_contract
+# ======================================
+# ========= Auction Cancellation ===============
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+# ========= Other assets========
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+
+# ========= Bid Cancellation ===============
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_bid_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_bid_cancellation.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_bid_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_bid_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_bid_cancellation.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_bid_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+# =========      End         ===============
+
+# ========= Full scenarios =========
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:provider
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:provider
+
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName"
+
+
+'''
+
 
 def newtend_date_picker_index(isodate):
     now = get_now()
@@ -80,4 +170,9 @@ def convert_nt_string_to_common_string(string):
         u'Trade canceled': u'active',
         u'Торг скасовано': u'active',
         u'Торг отменен': u'active',
+        u'Completed': u'complete',
+        u'Завершен': u'complete',
+        u'Завершено': u'complete',
+        u'До участі допускаються лише ліцензовані фінансові установи.': u'Only licensed financial institutions are eligible to participate.',
+        u'К участию допускаются только лицензированные финансовые учреждения.': u'Only licensed financial institutions are eligible to participate.',
     }.get(string, string)

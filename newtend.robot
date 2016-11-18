@@ -516,8 +516,26 @@ Login
 
   # :TODO Not realized
 Задати запитання на тендер
-  Fail   Not realized
-  # :TODO Not realized
+  [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} = username
+  ...      ${ARGUMENTS[1]} = ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} = question_data
+  ${title}=        Get From Dictionary  ${ARGUMENTS[2].data}  title
+  ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
+  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  newtend.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
+  Click Element                      xpath=//a[contains(text(), "Уточнения")]
+  Wait Until Page Contains Element   xpath=//button[@class="btn btn-lg btn-default question-btn ng-binding ng-scope"]   20
+  Click Element                      xpath=//button[@class="btn btn-lg btn-default question-btn ng-binding ng-scope"]
+  Wait Until Page Contains Element   xpath=//input[@ng-model="title"]   10
+  Input Text      xpath=//input[@ng-model="title"]   ${title}
+  Input Text      xpath=//textarea[@ng-model="message"]   ${description}
+  Click Element   xpath=//div[@ng-click="sendQuestion()"]
+  Wait Until Page Contains    ${description}   20
+#  Fail   Not realized
+
+  # TODO: Not realized
 Задати запитання на предмет
   Fail   Not realized
 
@@ -629,12 +647,22 @@ Login
   ${resp}=     Get text    xpath=//h3[@class="ng-binding"]
   [Return]     ${resp}
 
-#```
+
+# ========= Key words ========
 #Неможливість подати пропозицію першим учасником без кваліфікації      | FAIL |
 #Setup failed:
 #TypeError: can't subtract offset-naive and offset-aware datetimes
-#
-#```
+# Qualification - provider
+#------------------------------------------------------------------------------
+#Можливість завантажити протокол аукціону в пропозицію кандидата       | FAIL |
+#No keyword with name 'newtend.Завантажити протокол аукціону' found.
+#------------------------------------------------------------------------------
+#Можливість перевірити протокол аукціону                               | FAIL |
+#До ставки bid_index = 0 не завантажено документів
+#------------------------------------------------------------------------------
+
+
+
 
 
 Скасувати цінову пропозицію
@@ -679,18 +707,18 @@ Login
 Завантажити фінансову ліцензію
   [Arguments]  @{ARGUMENTS}
   [Documentation]
-  ...    ${ARGUMENTS[1]} ==  file
-  ...    ${ARGUMENTS[2]} ==  tenderId
+  ...    ${ARGUMENTS[0]} ==  file
+  ...    ${ARGUMENTS[1]} ==  tenderId
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
   Sleep     2
-  Log To Console    'Specify document type'
+  Log To Console    'Specify document type - financialLicense'
   Select From List By Value    xpath=//select[@id="documentType"]      financialLicense
   Sleep     2
   Execute Javascript  $('button[ng-file-select=""]').click()
   Sleep     3
-  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[0]}
   Click Element       xpath=//button[@ng-click="upload()"]
 
 Завантажити документ в ставку
@@ -826,6 +854,17 @@ Change_day_to_month
   # :TODO realize this key word
   Fail  Not realized
 
+Скасування рішення кваліфікаційної комісії
+  Fail  Not realized
+
+Завантажити документ рішення кваліфікаційної комісії
+  Fail  Not realized
+
+Дискваліфікувати постачальника
+  Fail  Not realized
+
+Завантажити угоду до тендера
+  Fail  Not realized
 # ======================
 # Qualification End
 # ======================

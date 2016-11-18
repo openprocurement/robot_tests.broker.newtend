@@ -87,6 +87,11 @@ bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial.txt 
 bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:provider
 bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:provider
 
+bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:viewer
+bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:viewer
+bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:viewer
+bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:viewer
+
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
 bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
 bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName

@@ -27,7 +27,6 @@ from calendar import monthrange
 # bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
 # bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_financial_simple.txt -v BROKER:Newtend -v ROLE:viewer -L TRACE:INFO -d test_output_newtend_viewer
 # ======================================
-
 # DGF Other assets
 # Newtend Auction Owner ================
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_simple.txt -v BROKER:Newtend -v ROLE:tender_owner -L TRACE:INFO -d test_output_Onewtend_owner
@@ -50,32 +49,25 @@ bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other
 # ========= Auction Cancellation ===============
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
-
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
 bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
-
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
 bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_financial_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
 # ========= Other assets========
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
-
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
 bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:provider
-
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
 bin/openprocurement_tests -s cancellation -A robot_tests_arguments/dgf_other_tender_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
-
 # ========= Bid Cancellation ===============
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_bid_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_bid_cancellation.txt -v BROKER:Newtend -v ROLE:provider
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial_bid_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
-
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_bid_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_bid_cancellation.txt -v BROKER:Newtend -v ROLE:provider
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other_bid_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
 # =========      End         ===============
-
 # ========= Full scenarios =========
 bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_financial.txt -v BROKER:Newtend -v ROLE:tender_owner
@@ -96,8 +88,6 @@ bin/openprocurement_tests -s openProcedure -A robot_tests_arguments/dgf_other.tx
 bin/openprocurement_tests -s auction -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
 bin/openprocurement_tests -s qualification -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName
 bin/openprocurement_tests -s contract_signing -A robot_tests_arguments/dgf_other.txt -v BROKER:BrokerName -v ROLE:RoleName"
-
-
 '''
 
 

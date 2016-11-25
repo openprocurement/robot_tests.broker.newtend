@@ -206,6 +206,8 @@ Login
   ...      ${ARGUMENTS[2]} ==  ${TENDER_UAID}
 #  Fail   Тест не написаний
   # Navigating to documents tab
+  Reload Page
+  Sleep     2
   Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Sleep     3
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
@@ -232,6 +234,8 @@ Login
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${image_path}
   # Navigating to documents tab
+  Reload Page
+  Sleep     2
   Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Sleep     3
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
@@ -258,6 +262,8 @@ Login
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${vdr_link}
   # Navigating to documents tab
+  Reload Page
+  Sleep     2
   Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Sleep     3
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
@@ -304,6 +310,7 @@ Login
   Log To Console   Searching for UFOs - ${ARGUMENTS[1]}
   Switch browser   ${ARGUMENTS[0]}
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   click element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
+  Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
   Input Text        xpath=//input[@type="search"]     ${auction_number}
@@ -505,13 +512,14 @@ Login
   ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   newtend.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-  Click Element                      xpath=//a[contains(text(), "Уточнения")]
-  Wait Until Page Contains Element   xpath=//button[@class="btn btn-lg btn-default question-btn ng-binding ng-scope"]   20
-  Click Element                      xpath=//button[@class="btn btn-lg btn-default question-btn ng-binding ng-scope"]
-  Wait Until Page Contains Element   xpath=//input[@ng-model="title"]   10
-  Input Text      xpath=//input[@ng-model="title"]   ${title}
-  Input Text      xpath=//textarea[@ng-model="message"]   ${description}
-  Click Element   xpath=//div[@ng-click="sendQuestion()"]
+  Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
+  Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
+  Click Element                      xpath=//button[@ng-click="askQuestion()"]
+#  Wait Until Page Contains Element   xpath=//input[@ng-model="title"]   10
+  Input Text      xpath=//input[@ng-model="chatData.title"]   ${title}
+  Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${description}
+  Sleep     2
+  Click Element   xpath=//button[@ng-click="sendQuestion()"]
   Wait Until Page Contains    ${description}   20
 
   # :TODO Not realized
@@ -525,19 +533,37 @@ Login
   ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   newtend.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-  Click Element                      xpath=//a[contains(text(), "Уточнения")]
-  Wait Until Page Contains Element   xpath=//button[@class="btn btn-lg btn-default question-btn ng-binding ng-scope"]   20
-  Click Element                      xpath=//button[@class="btn btn-lg btn-default question-btn ng-binding ng-scope"]
-  Wait Until Page Contains Element   xpath=//input[@ng-model="title"]   10
-  Input Text      xpath=//input[@ng-model="title"]   ${title}
-  Input Text      xpath=//textarea[@ng-model="message"]   ${description}
-  Click Element   xpath=//div[@ng-click="sendQuestion()"]
+  Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
+  Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
+  Click Element                      xpath=//button[@ng-click="askQuestion()"]
+  Wait Until Page Contains Element   xpath=//input[@ng-model="chatData.title"]   10
+  Input Text      xpath=//input[@ng-model="chatData.title"]   ${title}
+  Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${description}
+  Click Element   xpath=//button[@ng-click="sendQuestion()"]
   Wait Until Page Contains    ${description}   20
-#  Fail   Not realized
 
-  # TODO: Not realized
+  # TODO: In progress
 Задати запитання на предмет
-  Fail   Not realized
+  [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} = username
+  ...      ${ARGUMENTS[1]} = ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} = item_id
+  ...      ${ARGUMENTS[3]} = question_data
+  log to console  argument1 - '${ARGUMENTS[1]}'
+  log to console  argument2 - '${ARGUMENTS[2]}'
+  log to console  argument3 - '${ARGUMENTS[3]}'
+  ${title}=        Get From Dictionary  ${ARGUMENTS[3].data}  title
+  ${description}=  Get From Dictionary  ${ARGUMENTS[3].data}  description
+  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  newtend.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
+  Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
+  Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
+  Click Element                      xpath=//button[@ng-click="askQuestion()"]
+  Input Text      xpath=//input[@ng-model="chatData.title"]   ${title}
+  Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${description}
+  Click Element   xpath=//button[@ng-click="sendQuestion()"]
+  Wait Until Page Contains    ${description}   20
 
 Оновити сторінку з тендером
   [Arguments]  @{ARGUMENTS}
@@ -628,7 +654,12 @@ Login
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == tender_uaid
   ...      ${ARGUMENTS[2]} == ${test_bid_data}
+  Log to Console    arg0 - '${ARGUMENTS[0]}'
+  Log to Console    arg1 - '${ARGUMENTS[1]}'
+  Log to Console    arg2 - '${ARGUMENTS[2]}'
   ${amount}=    Get From Dictionary     ${ARGUMENTS[2].data.value}    amount
+  Run Keyword If    ${ARGUMENTS[2].data}   qualified   ${qualify}=   Get From Dictionary     ${ARGUMENTS[2].data}          qualified
+  Log to Console    Qualification status - '${bid['data'].qualified}'
   Reload Page
   : FOR   ${INDEX}   IN RANGE    1    30
   \   Log To Console   .   no_newline=true
@@ -639,7 +670,8 @@ Login
   ${amount_bid}=    Convert To Integer                 ${amount}
   Clear Element Text  xpath=//input[@name="amount"]
   Input Text          xpath=//input[@name="amount"]    ${amount_bid}
-  Click Element       xpath=//input[@name="agree"]
+  Click Element       xpath=//input[@name="agree"]          # Credential confirm
+  Run Keyword If      ${bid['data'].qualified} = False   Click Element       xpath=//input[@name="bid-valid"]      # Validation of bid
   Click Element       xpath=//button[@ng-click="placeBid()"]
   Sleep   3
   Reload Page

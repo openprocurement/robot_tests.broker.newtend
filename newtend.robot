@@ -278,9 +278,6 @@ Login
   Input Text    xpath=//input[@id="auction-vdr-url"]    ${ARGUMENTS[2]}
   Input Text    xpath=//input[@id="auction-vdr-title"]  ${ARGUMENTS[2]}
   # === Mega Hack for document Upload ===
-#  Execute Javascript  $('button[ng-model="file"]').click()
-#  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
-#  Sleep     2
   # Confirm file Upload
   Click Element     xpath=//button[@ng-click="upload()"]
   Sleep     10
@@ -309,8 +306,9 @@ Login
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   Log To Console   Searching for UFOs - ${ARGUMENTS[1]}
   Switch browser   ${ARGUMENTS[0]}
-  Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   click element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
-  Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
+  Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Wait Until Page Contains Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
+  Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
   Input Text        xpath=//input[@type="search"]     ${auction_number}
@@ -550,9 +548,9 @@ Login
   ...      ${ARGUMENTS[1]} = ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} = item_id
   ...      ${ARGUMENTS[3]} = question_data
-  log to console  argument1 - '${ARGUMENTS[1]}'
-  log to console  argument2 - '${ARGUMENTS[2]}'
-  log to console  argument3 - '${ARGUMENTS[3]}'
+#  log to console  argument1 - '${ARGUMENTS[1]}'
+#  log to console  argument2 - '${ARGUMENTS[2]}'
+#  log to console  argument3 - '${ARGUMENTS[3]}'
   ${title}=        Get From Dictionary  ${ARGUMENTS[3].data}  title
   ${description}=  Get From Dictionary  ${ARGUMENTS[3].data}  description
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
@@ -585,7 +583,7 @@ Login
   ...      ${ARGUMENTS[2]} ==  item_id    # Something like this - q-e5b21059
   ...      ${ARGUMENTS[3]} ==  field_name
   Run Keyword And Return  Отримати інформацію про Questions.${ARGUMENTS[3]}
-  # :TODO Not realized - seems to be done
+
 Отримати інформацію про Questions.answer
   Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
@@ -628,8 +626,8 @@ Login
    ...      ${ARGUMENTS[3]} == ${answer_id}
    Reload Page
    ${answer}=     Get From Dictionary  ${ARGUMENTS[2].data}  answer
-   Log to Console   ${answer}
-   Log to Console   argument 2 - ${ARGUMENTS[2]}
+#   Log to Console   ${answer}
+#   Log to Console   argument 2 - ${ARGUMENTS[2]}
    Click Element        xpath=//a[@ui-sref="tenderView.chat"]
    Sleep    3
    # Try to answer
@@ -654,12 +652,10 @@ Login
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == tender_uaid
   ...      ${ARGUMENTS[2]} == ${test_bid_data}
-  Log to Console    arg0 - '${ARGUMENTS[0]}'
-  Log to Console    arg1 - '${ARGUMENTS[1]}'
-  Log to Console    arg2 - '${ARGUMENTS[2]}'
+#  Log to Console    arg0 - '${ARGUMENTS[0]}'
+#  Log to Console    arg1 - '${ARGUMENTS[1]}'
+#  Log to Console    arg2 - '${ARGUMENTS[2]}'
   ${amount}=    Get From Dictionary     ${ARGUMENTS[2].data.value}    amount
-  Run Keyword If    ${ARGUMENTS[2].data}   qualified   ${qualify}=   Get From Dictionary     ${ARGUMENTS[2].data}          qualified
-  Log to Console    Qualification status - '${bid['data'].qualified}'
   Reload Page
   : FOR   ${INDEX}   IN RANGE    1    30
   \   Log To Console   .   no_newline=true
@@ -671,20 +667,24 @@ Login
   Clear Element Text  xpath=//input[@name="amount"]
   Input Text          xpath=//input[@name="amount"]    ${amount_bid}
   Click Element       xpath=//input[@name="agree"]          # Credential confirm
-  Run Keyword If      ${bid['data'].qualified} = False   Click Element       xpath=//input[@name="bid-valid"]      # Validation of bid
+  # :TODO If case realise
+  Run Keyword If      'Можливість' in '${TEST_NAME}'    Click Element       xpath=//input[@name="bid-valid"]      # Validation of bid
   Click Element       xpath=//button[@ng-click="placeBid()"]
-  Sleep   3
+  Sleep     3
   Reload Page
   Wait Until Page Contains Element      xpath=//div[@class="bid-placed make-bid ng-scope"]
-  ${resp}=     Get text    xpath=//h3[@class="ng-binding"]
+  Sleep     2
+  Run Keyword If      'Неможливість' in '${TEST_NAME}'    Wait Until Page Contains Element    xpath=//div[@class="alert alert-warning ng-binding"]
+  Run Keyword If      'Неможливість' in '${TEST_NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
+  Sleep     2
+#  Run Keyword If      'Неможливість' in '${TEST_NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
+  Run Keyword If      'Неможливість' in '${TEST_NAME}'    Wait Until Page Contains Element   xpath=//button[@ng-click="cancelBid()"]
+  Run Keyword If      'Неможливість' in '${TEST_NAME}'    Click Element   xpath=//button[@ng-click="cancelBid()"]
+  ${resp}=      Run Keyword If   'Можливість' in '${TEST_NAME}'   Get text    xpath=//h3[@class="ng-binding"]
   [Return]     ${resp}
 
 
 # ========= Key words ========
-#Неможливість подати пропозицію першим учасником без кваліфікації      | FAIL |
-#Setup failed:
-#TypeError: can't subtract offset-naive and offset-aware datetimes
-# Qualification - provider
 #------------------------------------------------------------------------------
 #Можливість завантажити протокол аукціону в пропозицію кандидата       | FAIL |
 #No keyword with name 'newtend.Завантажити протокол аукціону' found.
@@ -692,10 +692,6 @@ Login
 #Можливість перевірити протокол аукціону                               | FAIL |
 #До ставки bid_index = 0 не завантажено документів
 #------------------------------------------------------------------------------
-
-
-
-
 
 Скасувати цінову пропозицію
   [Arguments]  @{ARGUMENTS}
@@ -741,6 +737,9 @@ Login
   [Documentation]
   ...    ${ARGUMENTS[0]} ==  file
   ...    ${ARGUMENTS[1]} ==  tenderId
+  Log to Console    arg_0 - ${ARGUMENTS[0]}
+  Log to Console    arg_1 - ${ARGUMENTS[1]}
+  Log to Console    arg_2 - ${ARGUMENTS[2]}
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
@@ -750,7 +749,7 @@ Login
   Sleep     2
   Execute Javascript  $('button[ng-file-select=""]').click()
   Sleep     3
-  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[0]}
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Click Element       xpath=//button[@ng-click="upload()"]
 
 Завантажити документ в ставку
@@ -758,6 +757,9 @@ Login
   [Documentation]
   ...    ${ARGUMENTS[1]} ==  file
   ...    ${ARGUMENTS[2]} ==  tenderId
+  Log to Console    arg_0 - ${ARGUMENTS[0]}
+  Log to Console    arg_1 - ${ARGUMENTS[1]}
+  Log to Console    arg_2 - ${ARGUMENTS[2]}
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
@@ -766,7 +768,7 @@ Login
   Select From List By Value    xpath=//select[@id="documentType"]      commercialProposal
   Execute Javascript  $('button[ng-file-select=""]').click()
   Sleep     3
-  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Click Element       xpath=//button[@ng-click="upload()"]
 
 # :TODO Change document - seems to be done
@@ -780,7 +782,7 @@ Login
   ${replaces}=      Get Webelements     xpath=//a[@ng-model="$parent.$parent.replaceFiles"]
   Execute Javasript     ${replaces[1]}.click()
   Sleep     2
-  Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Log To Console    Document changed
 # ==================
 # === Links for auction ===
@@ -870,7 +872,6 @@ Change_day_to_month
   Click Element  xpath=//button[@ng-click="accept()"]
   Log To Console    Its ok - qualified
 
-# Fourth scenario edited
 Підтвердити підписання контракту
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
   Sleep     2

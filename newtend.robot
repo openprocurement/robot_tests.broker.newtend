@@ -48,15 +48,15 @@ ${locator.view.enquiryPeriod.endDate}       id=end-date-qualification
 ${locator.view.items[0].deliveryDate.endDate}   id=end-date-delivery
 ${locator.view.procuringEntity.name}        id=view-customer-name
 ${locator.view.items[0].deliveryAddress}    id=deliveryAddress
-${locator.view.items[0].classification.scheme.title}   id=classifier-0
-${locator.view.items[0].classification.scheme}      id=classifier-0
-${locator.view.items[0].classification.id}      xpath=//label[@for="classifier-0"]
+${locator.view.items[0].classification.scheme.title}   id=classifier
+${locator.view.items[0].classification.scheme}      id=classifier
+${locator.view.items[0].classification.id}      xpath=//label[@for="classifier"]
 ${locator.view.QUESTIONS[0].title}          xpath=//span[@class="user ng-binding"]
 ${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
 ${locator.view.QUESTIONS[0].date}           xpath=//span[@class="date ng-binding"]
 ${locator.view.items[0].unit.name}          xpath=//span[@class="unit ng-binding"]
-${locator.view.items[0].quantity}           id=quantity-0
-${locator.view.items[0].description}        id=view-item-description-0
+${locator.view.items[0].quantity}           id=quantity
+${locator.view.items[0].description}        id=view-item-description
 ${locator.view.auctionId}                   xpath=//a[@class="ng-binding ng-scope"]
 ${locator.view.value.valueAddedTaxIncluded}         xpath=//label[@for="with-nds"]
 ${locator.view.value.currency}              xpath=//label[@for="budget"]
@@ -127,18 +127,18 @@ Login
   Click Element     id=with-nds
 
 # Moving to Lot's modal
-#  Click Element     ${locator.lot.add}
-#  Input text        ${locator.lot.name}            Lot name
-#  Input text        ${locator.lot.description}     Lot description
+  Click Element     ${locator.lot.add}
+  Input text        ${locator.lot.name}            Lot name
+  Input text        ${locator.lot.description}     Lot description
   ${budget}         convert to string       ${budget}
-  Input text        ${locator.value.amount}       ${budget}
+  Input text        ${locator.lot.value}       ${budget}
   ${step_rate}      convert to string       ${step_rate}
-  Input text        ${locator.minimalStep.amount}     ${step_rate}
-#  Click Element     ${locator.lot.confirm.btn}
-#
-#  # Selecting related lot
-#  Click Element     xpath=//select[@ng-model="item.relatedLot"]
-#  Click Element     xpath=//option[@label='Lot name']
+  Input text        ${locator.lot.step}     ${step_rate}
+  Click Element     ${locator.lot.confirm.btn}
+
+  # Selecting related lot
+  Click Element     xpath=//select[@ng-model="item.relatedLot"]
+  Click Element     xpath=//option[@label='Lot name']
 
 
   # Filling Items fields
@@ -201,13 +201,13 @@ Login
   log to console  ${TENDER_UAID}
   [return]  ${TENDER_UAID}
 
-#Set Multi Ids
-#  [Arguments]  @{ARGUMENTS}
-#  [Documentation]
-#  ...      ${ARGUMENTS[0]} ==  ${tender_UAid}
-#  ${current_location}=      Get Location
-#  ${id}=    Get Substring   ${current_location}   -41   -9
-#  ${Ids}=   Create List     ${tender_UAid}   ${id}
+Set Multi Ids
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  ${tender_UAid}
+  ${current_location}=      Get Location
+  ${id}=    Get Substring   ${current_location}   -41   -9
+  ${Ids}=   Create List     ${tender_UAid}   ${id}
 
 Set datetime
   [Arguments]  @{ARGUMENTS}
@@ -262,7 +262,9 @@ Set datetime
 Завантажити документ
   [Arguments]  @{ARGUMENTS}
   [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
+   ...      ${ARGUMENTS[0]} ==  username
+#-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+#-  ...      ${ARGUMENTS[2]} ==  ${filepath}
   ...      ${ARGUMENTS[1]} ==  ${filepath}
   ...      ${ARGUMENTS[2]} ==  ${TENDER_UAID}
    # For tender owner docs uploading
@@ -697,78 +699,31 @@ Change_day_to_month
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait until page contains element    xpath=//button[@ng-click="uploadDocument()"]
   Click element       xpath=//button[@ng-click="uploadDocument()"]
+  Click element       xpath=//button[@ng-model="file"]
   sleep     3
-  Select from list by index     xpath=//select[@id="documentType"]      2
-  Execute Javascript  $('button[ng-model="file"]').click()
-  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
-  Click element     xpath=//button[@ng-click="upload()"]
-  sleep     3
-  Reload page
+  Choose file         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
+  Click file         xpath=//button[@ng-click="upload()"]
 
 
 Змінити документ в ставці
   [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...    ${ARGUMENTS[0]} ==  username
-  ...    ${ARGUMENTS[1]} ==  file
-  ...    ${ARGUMENTS[2]} ==  tenderId
-#  reload page
-#  sleep     2
-#  Click element     xpath=//a[@ui-sref="tenderView.documents"]
-#  Wait until page contains element      xpath=//a[@ng-model="$parent.$parent.replaceFiles"]     10
-#  Execute Javascript  $('a[ng-model="$parent.$parent.replaceFiles"]').click()
-#  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
-##  Click element     xpath=//button[@ng-click="upload()"]
-#  sleep     3
-#  Reload page
-  reload page
-  sleep     2
-  Click Element       xpath=//a[@ui-sref="tenderView.documents"]
-  Wait until page contains element    xpath=//button[@ng-click="uploadDocument()"]
-  Click element       xpath=//button[@ng-click="uploadDocument()"]
-  sleep     3
-  Select from list by index     xpath=//select[@id="documentType"]      2
-  Execute Javascript  $('button[ng-model="file"]').click()
-  Choose file       xpath=//input[@type="file"]    ${ARGUMENTS[1]}
-  Click element     xpath=//button[@ng-click="upload()"]
-  sleep     3
-  Reload page
-
-
 
 
 Отримати посилання на аукціон для глядача
   [Arguments]  @{ARGUMENTS}
   reload page
   sleep     3
-  reload page
   Click element     xpath=//a[@ui-sref="tenderView.auction"]
-  sleep     240
-  : FOR   ${INDEX}   IN RANGE    1    60
-  \   reload page
-  \   Log To Console   .   no_newline=true
-  \   sleep     15
-  \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
-  \   Exit For Loop If   '${count}' == '1'
   Wait until page contains element      xpath=//a[@class="auction-link ng-binding"]     10
   ${result} =    Get Element Attribute  xpath=//a[@target="_blank"]@href
   log to console    ${result}
-  [Return]   ${result}
 
 
 Отримати посилання на аукціон для учасника
   [Arguments]  @{ARGUMENTS}
   reload page
-  sleep     2
-  Click element     xpath=//a[@ui-sref="tenderView.overview"]
-  sleep     360
-  : FOR   ${INDEX}   IN RANGE    1    60
-  \   reload page
-  \   Log To Console   .   no_newline=true
-  \   sleep     15
-  \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
-  \   Exit For Loop If   '${count}' == '1'
+  sleep     3
+  Click element     xpath=//a[@ui-sref="tenderView.auction"]
   Wait until page contains element      xpath=//a[@class="auction-link ng-binding"]     10
-  ${result} =    Get Element Attribute   xpath=//a[@target="_blank"]@href
+  ${result} =    Get Element Attribute  xpath=//a[@target="_blank"]@href
   log to console    ${result}
-  [Return]   ${result}

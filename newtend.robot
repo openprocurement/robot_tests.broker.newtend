@@ -123,7 +123,7 @@ Login
   ${deliveryaddress_locality}=             Get From Dictionary         ${item0.deliveryAddress}               locality
 
 
-#  # Date of auction start
+# Date of auction start
   ${start_date}=    Get From Dictionary   ${ARGUMENTS[1].data.auctionPeriod}    startDate
 
   Wait Until Page Contains Element   xpath=//a[@ui-sref="createTender"]   100
@@ -204,7 +204,6 @@ Login
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${file_path}
   ...      ${ARGUMENTS[2]} ==  ${TENDER_UAID}
-#  Fail   Тест не написаний
   # Navigating to documents tab
   Reload Page
   Sleep     2
@@ -476,7 +475,6 @@ Login
   ${period_interval}=  Get Broker Property By Username  ${ARGUMENTS[0]}  period_interval
   ${ADDITIONAL_DATA}=  prepare_test_tender_data  ${period_interval}      multi
   ${items}=            Get From Dictionary   ${ADDITIONAL_DATA.data}     items
-#  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   Wait Until Page Contains Element   ${locator.edit_tender}    10
   Click Element                      ${locator.edit_tender}
   Wait Until Page Contains Element   ${locator.edit.add_item}  10
@@ -499,7 +497,6 @@ Login
   Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
   Click Element                      xpath=//button[@ng-click="askQuestion()"]
-#  Wait Until Page Contains Element   xpath=//input[@ng-model="title"]   10
   Input Text      xpath=//input[@ng-model="chatData.title"]   ${title}
   Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${description}
   Sleep     2
@@ -520,7 +517,6 @@ Login
   ...      ${ARGUMENTS[2]} = question_data
   ${title}=        Get From Dictionary  ${ARGUMENTS[2].data}  title
   ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
-#  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   newtend.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
@@ -547,12 +543,8 @@ Login
   ...      ${ARGUMENTS[1]} = ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} = item_id
   ...      ${ARGUMENTS[3]} = question_data
-#  log to console  argument1 - '${ARGUMENTS[1]}'
-#  log to console  argument2 - '${ARGUMENTS[2]}'
-#  log to console  argument3 - '${ARGUMENTS[3]}'
   ${title}=        Get From Dictionary  ${ARGUMENTS[3].data}  title
   ${description}=  Get From Dictionary  ${ARGUMENTS[3].data}  description
-#  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   newtend.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
@@ -577,7 +569,6 @@ Login
   [Documentation]
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == ${TENDER_UAID}
-#  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   Reload Page
 
 # ==========================
@@ -615,7 +606,6 @@ Login
   [Return]  ${resp}
 
 отримати інформацію про questions.description
-# ${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[-1]}
   Log To Console    ${resp}
@@ -630,8 +620,6 @@ Login
    ...      ${ARGUMENTS[3]} == ${answer_id}
    Reload Page
    ${answer}=     Get From Dictionary  ${ARGUMENTS[2].data}  answer
-#   Log to Console   ${answer}
-#   Log to Console   argument 2 - ${ARGUMENTS[2]}
    Click Element        xpath=//a[@ui-sref="tenderView.chat"]
    Sleep    3
    # Try to answer
@@ -668,7 +656,6 @@ Login
   Clear Element Text  xpath=//input[@name="amount"]
   Input Text          xpath=//input[@name="amount"]    ${amount_bid}
   Click Element       xpath=//input[@name="agree"]          # Credential confirm
-  # :TODO If case realise
   Run Keyword If      'Можливість' in '${TEST NAME}'    Click Element       xpath=//input[@name="bid-valid"]      # Validation of bid
   Click Element       xpath=//button[@ng-click="placeBid()"]
   Sleep     3
@@ -677,12 +664,9 @@ Login
   Sleep     2
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Reload Page
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element    xpath=//div[@class="alert alert-warning ng-binding"]
-#  ${resp}=      Run Keyword If      'Неможливість' in '${TEST NAME}'    Get Text    xpath=//div[@class="alert alert-warning ng-binding"]
-#  ${resp}=      Run Keyword If      'Неможливість' in '${TEST NAME}'    Get Text    xpath=//div[@class="alert alert-warning ng-binding"]
   ${alert}=     Run Keyword If      'Неможливість' in '${TEST NAME}'    Get Matching Xpath Count    xpath=//div[@class="alert alert-warning ng-binding"]
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
   Sleep     2
-#  Run Keyword If      'Неможливість' in '${TEST_NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element   xpath=//button[@ng-click="cancelBid()"]
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Click Element   xpath=//button[@ng-click="cancelBid()"]
   ${resp}=      Run Keyword If   'Неможливість' in '${TEST NAME}'    Run Keyword If   '${alert}' == '1'    '${False}'
@@ -729,7 +713,7 @@ Login
     Click Element       xpath=//button[@ng-click="changeBid()"]
     Sleep   3
     Reload Page
-    # :TODO fin document - seems to be done
+
 Завантажити фінансову ліцензію
   [Arguments]  @{ARGUMENTS}
   [Documentation]
@@ -769,7 +753,6 @@ Login
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Click Element       xpath=//button[@ng-click="upload()"]
 
-# :TODO Change document - seems to be done
 Змінити документ в ставці
   [Arguments]  @{ARGUMENTS}
   [Documentation]
@@ -789,14 +772,15 @@ Login
   Reload Page
   Sleep     3
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep     2
   # Waiting for auction viewer link
-  : FOR   ${INDEX}   IN RANGE    1    30
+  : FOR   ${INDEX}   IN RANGE    1    50
   \   reload page
-  \   Log To Console   .   no_newline=true
-  \   sleep     30
+  \   Log To Console   y-   no_newline=true
+  \   sleep     40
   \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
   \   ${link}=    Get Element Attribute      xpath=//a[@target="_blank"]@href
-  \   Exit For Loop If   '${count}' == '1' and '${link}' != 'None'
+  \   Exit For Loop If   '${count}' > '0' and '${link}' != 'None'
   Wait Until Page Contains Element      xpath=//a[@class="auction-link ng-binding"]     10
   ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
   ${result}=    Convert To String  ${result}
@@ -809,14 +793,15 @@ Login
   Reload Page
   Sleep     3
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep     3
   # Waiting for auction participant link
-  : FOR   ${INDEX}   IN RANGE    1    30
+  : FOR   ${INDEX}   IN RANGE    1    50
   \   reload page
-  \   Log To Console   .   no_newline=true
-  \   sleep     30
+  \   Log To Console   -x   no_newline=true
+  \   sleep     40
   \   ${count}=   Get Matching Xpath Count   xpath=//a[@class="auction-link ng-binding"]
   \   ${link}=    Get Element Attribute      xpath=//a[@target="_blank"]@href
-  \   Exit For Loop If   '${count}' == '1' and '${link}' != 'None'
+  \   Exit For Loop If   '${count}' > '1' and '${link}' != 'None'
   Wait Until Page Contains Element      xpath=//a[@class="auction-link ng-binding"]     10
   ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
   ${result}=    Convert To String       ${result}
@@ -898,18 +883,14 @@ Change_day_to_month
   Wait Until Page Contains Element      xpath=//div[@class="col-xs-4 status ng-binding pending"]    10
   Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending"]
   Sleep     3
-#  ${docs_number}=    Get Matching Xpath Count     xpath=//div[contains(text(), 'auctionProtocol')]
-#  ${docs_number}=    Get Matching Xpath Count     xpath=//div[@class="type ng-binding"]   # Lets check what do we need?
-# :TODO - take away Some hard code
-  ${docs_number}=    convert to integer   1
+  ${docs_number}=    Get Matching Xpath Count     xpath=//div[@class="type ng-binding"][contains(text(), 'Auction protocol')]
   Log To Console    Number of docs - '${docs_number}'
   [Return]   ${docs_number}
 
-# :TODO - Need to check doc name gathering
 Отримати дані із документу пропозиції
-  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-  ${doc_title}=     Get WebElements    xpath=//div[contains(text(), 'auctionProtocol')]
-  ${title}=         Get Text           ${doc_title[-1]}
+  [Arguments]  ${username}  ${tender_uaid}  ${bid_index}  ${document_index}  ${field}
+  ${doc_title}=     Get WebElements    xpath=//div[contains(text(), 'Auction protocol')]
+  ${title}=         Run Keyword If     '${doc_title}' > '0'     Convert To String   auctionProtocol
   Log To Console    ${title}
   [Return]  ${title}
 
@@ -1023,8 +1004,44 @@ Accept Protocol
   Reload Page
   Sleep     2
 
-
-
+Завантажити протокол аукціону
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]}  ==  user_name
+  ...      ${ARGUMENTS[1]}  ==  auction_uaid
+  ...      ${ARGUMENTS[2]}  ==  file_path
+  ...      ${ARGUMENTS[3]}  ==  docs_number
+#  Log To Console    arg_0 - '${ARGUMENTS[0]}'
+#  Log To Console    arg_1 - '${ARGUMENTS[1]}'
+#  Log To Console    arg_2 - '${ARGUMENTS[2]}'
+#  Log To Console    arg_3 - '${ARGUMENTS[3]}'
+  Sleep     2
+  Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
+  Sleep     2
+  ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
+  Input Text        xpath=//input[@type="search"]     ${auction_number}
+  Click Element     xpath=//div[@ng-click="search()"]
+  Sleep     2
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]   10
+  Sleep     2
+  Click Element                      xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]
+  Sleep     5
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     2
+  Wait Until Page Contains Element      xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  Sleep     2
+  Wait Until Page Contains Element  xpath=//button[@ng-file-select=""]
+  Execute Javascript  $('button[ng-file-select=""]').click()
+  Choose File    xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+  Sleep     5
+  Select From List By Value     xpath=//select[@id="documentType"]   auctionProtocol
+  Sleep     2
+  Mouse Over    xpath=//button[@ng-click="upload()"]
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     20
+  Reload Page
+  Sleep     3
 
 # ======================
 # Qualification End
@@ -1093,9 +1110,19 @@ Accept Protocol
 
 Отримати інформацію із документа    # Document Title
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-  ${doc_title}=     Get WebElements    xpath=//a[@class="ng-binding"]
-  ${title}=         Get Text           ${doc_title[-1]}
+  Wait Until Page Contains Element  xpath=//a[@class="ng-binding"]
+  Sleep     2
+  ${title}=   Get Text   xpath=//a[contains(text(), '${doc_id}')]
   Log To Console    ${title}
   [Return]  ${title}
+
+Отримати документ
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+  ${file_name}=   Get Text   xpath=//a[contains(text(), '${doc_id}')]
+  Log To Console    file name - ${file_name}
+  ${url}=   Get Element Attribute   xpath=//a[contains(text(), '${doc_id}')]@href
+  Log To Console   URL - ${url}
+  download_file   ${url}  ${file_name}  ${OUTPUT_DIR}
+  [Return]  ${file_name}
 
 # ========== Auction Cancellation ============

@@ -4,6 +4,11 @@ from pytz import timezone
 from iso8601 import parse_date
 from op_robot_tests.tests_files.service_keywords import get_now
 from calendar import monthrange
+import urllib
+
+
+def download_file(url, file_name, output_dir):
+    urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
 
 
 def newtend_date_picker_index(isodate):
@@ -80,4 +85,9 @@ def convert_nt_string_to_common_string(string):
         u'Trade canceled': u'active',
         u'Торг скасовано': u'active',
         u'Торг отменен': u'active',
+        u'Completed': u'complete',
+        u'Завершен': u'complete',
+        u'Завершено': u'complete',
+        u'До участі допускаються лише ліцензовані фінансові установи.': u'Only licensed financial institutions are eligible to participate.',
+        u'К участию допускаются только лицензированные финансовые учреждения.': u'Only licensed financial institutions are eligible to participate.',
     }.get(string, string)

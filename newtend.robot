@@ -293,7 +293,7 @@ Login
   Switch browser   ${ARGUMENTS[0]}
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Wait Until Page Contains Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
-  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Go To     http://ea-trunk.newtend.com/provider/
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
   Input Text        xpath=//input[@type="search"]     ${auction_number}
@@ -733,6 +733,7 @@ Login
   Sleep     3
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Click Element       xpath=//button[@ng-click="upload()"]
+  Sleep     10
 
 Завантажити документ в ставку
   [Arguments]  @{ARGUMENTS}
@@ -876,13 +877,14 @@ Change_day_to_month
   log to console  arg-0 - '${ARGUMENTS[0]}'
   log to console  arg-1 - '${ARGUMENTS[1]}'
   log to console  arg-2 - '${ARGUMENTS[2]}'
+  Sleep     60
   # Docs count inside the bid awaiting for Accept
   Reload Page
   Wait Until Page Contains Element      xpath=//a[@ui-sref="tenderView.auction"]    10
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Wait Until Page Contains Element      xpath=//div[@class="col-xs-4 status ng-binding pending"]    10
   Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending"]
-  Sleep     3
+  Sleep     60
   ${docs_number}=    Get Matching Xpath Count     xpath=//div[@class="type ng-binding"][contains(text(), 'Auction protocol')]
   Log To Console    Number of docs - '${docs_number}'
   [Return]   ${docs_number}
@@ -1015,7 +1017,6 @@ Accept Protocol
 #  Log To Console    arg_1 - '${ARGUMENTS[1]}'
 #  Log To Console    arg_2 - '${ARGUMENTS[2]}'
 #  Log To Console    arg_3 - '${ARGUMENTS[3]}'
-  Sleep     2
   Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
@@ -1031,15 +1032,17 @@ Accept Protocol
   Wait Until Page Contains Element      xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   Sleep     2
-  Wait Until Page Contains Element  xpath=//button[@ng-file-select=""]
-  Execute Javascript  $('button[ng-file-select=""]').click()
-  Choose File    xpath=//input[@type="file"]    ${ARGUMENTS[2]}
-  Sleep     5
+  Select From List By Value     xpath=//select[@id="documentOf"]   tender
+  Sleep     2
   Select From List By Value     xpath=//select[@id="documentType"]   auctionProtocol
   Sleep     2
-  Mouse Over    xpath=//button[@ng-click="upload()"]
+  Wait Until Page Contains Element  xpath=//button[@ng-file-select=""]  10
+  Execute Javascript  $('button[ng-file-select=""]').click()
+  Sleep     2
+  Choose File    xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+  Sleep     5
   Click Element     xpath=//button[@ng-click="upload()"]
-  Sleep     20
+  Sleep     60
   Reload Page
   Sleep     3
 

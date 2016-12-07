@@ -1017,7 +1017,8 @@ Accept Protocol
 #  Log To Console    arg_1 - '${ARGUMENTS[1]}'
 #  Log To Console    arg_2 - '${ARGUMENTS[2]}'
 #  Log To Console    arg_3 - '${ARGUMENTS[3]}'
-  Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
+  Run Keyword If    '${ARGUMENTS[0]}' != 'Newtend_Viewer'   Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
+  Run Keyword If    '${ARGUMENTS[0]}' == 'Newtend_Viewer'   Go To    http://ea-trunk.newtend.com/provider/
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
   Input Text        xpath=//input[@type="search"]     ${auction_number}

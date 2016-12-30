@@ -1,5 +1,5 @@
 *** Settings ***
-Library  Selenium2Screenshots
+#Library  Selenium2Screenshots
 Library  Selenium2Library
 Library  String
 Library  DateTime
@@ -49,13 +49,21 @@ ${locator.view.items[0].deliveryDate.endDate}   id=end-date-delivery
 ${locator.view.procuringEntity.name}        id=view-customer-name
 ${locator.view.items[0].deliveryAddress}    id=deliveryAddress
 ${locator.view.items[0].classification.scheme.title}  xpath=//label[@for="classifier-0"]   # id=classifier-0
+${locator.view.items[1].classification.scheme.title}  xpath=//label[@for="classifier-1"]   # id=classifier-0
+${locator.view.items[2].classification.scheme.title}  xpath=//label[@for="classifier-2"]   # id=classifier-0
 ${locator.view.items[0].classification.scheme}        id=classifier-0
+${locator.view.items[1].classification.scheme}        id=classifier-1
+${locator.view.items[2].classification.scheme}        id=classifier-2
 ${locator.view.items[0].classification.id}            id=classifier-0
+${locator.view.items[1].classification.id}            id=classifier-1
+${locator.view.items[2].classification.id}            id=classifier-2
 ${locator.view.QUESTIONS[0].title}          xpath=//span[@class="user ng-binding"]
 ${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
 ${locator.view.QUESTIONS[0].date}           xpath=//span[@class="date ng-binding"]
 ${locator.view.items[0].unit.name}          xpath=//span[@class="unit ng-binding"]
 ${locator.view.items[0].quantity}           id=quantity-0
+${locator.view.items[1].quantity}           id=quantity-1
+${locator.view.items[2].quantity}           id=quantity-2
 ${locator.view.items[0].description}        id=view-item-description-0
 ${locator.view.items[1].description}        id=view-item-description-1
 ${locator.view.items[2].description}        id=view-item-description-2
@@ -422,7 +430,6 @@ Login
   Sleep     2
 
 # ====Newtend===========
-# :TODO check for correct work
 Отримати кількість предметів в тендері
   [Arguments]  @{ARGUMENTS}
   Reload Page
@@ -461,10 +468,6 @@ Login
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  tender_uaid
   ...      ${ARGUMENTS[2]} ==  field_name
-#  Switch browser   ${ARGUMENTS[0]}
-  Log To Console    отримати інформацію із тендера - 0 - '${ARGUMENTS[0]}'
-  Log To Console    отримати інформацію із тендера - 1 - '${ARGUMENTS[1]}'
-  Log To Console    отримати інформацію із тендера - 2 - '${ARGUMENTS[2]}'
   Run Keyword And Return  Отримати інформацію про ${ARGUMENTS[2]}
 
 отримати текст із поля і показати на сторінці
@@ -489,10 +492,8 @@ Login
   [Return]  ${description}
 
 отримати інформацію про dgfDecisionID
-  ${dgfDecisionID_full}=   отримати текст із поля і показати на сторінці   dgfDecisionID
-  ${dgfDecisionID}=     ${dgfDecisionID_full.split('№')[-1]}
-  Log To Console    decision number - ${dgfDecisionID}
-  [Return]  ${dgfDecisionID}
+  ${dgfDecisionID_full}=   Get Text      xpath=//div[@id="view-tender-dgfDecisionID"]
+  [Return]      ${dgfDecisionID_full.split(u"№")[-1]}
 
 отримати інформацію про dgfID
   ${description}=   отримати текст із поля і показати на сторінці   dgfID
@@ -500,12 +501,13 @@ Login
 
 Отримати інформацію про dgfDecisionDate
   ${date_text}=    Get Text      xpath=//div[@id="view-tender-dgfDecisionID"]
-  ${date}=    Get Substring      ${date_text}   5   10
-  Log To Console    ${date}
+  ${date}=    Get Substring      ${date_text}   4   14
   [Return]    ${date}
 
 Отримати інформацію про tenderAttempts
-  ${attempts}=  Get Text    xpath=//div[@id="tenderAttempts"]
+  ${attempts_raw}=  Get Text    xpath=//div[@id="tenderAttempts"]
+  ${attempts_value}=   Get Substring   ${attempts_raw}     -2    -1
+  ${attempts}=   Convert To Integer     ${attempts_value}
   [Return]      ${attempts}
 
 отримати інформацію про auctionId
@@ -515,7 +517,6 @@ Login
 отримати інформацію про value.amount
   ${valueAmount}=   отримати текст із поля і показати на сторінці   value.amount
   ${valueAmount}=   Convert To Number   ${valueAmount.split(' ')[0]}
-  Log To Console    value amount - ${valueAmount}
   [Return]  ${valueAmount}
 
 отримати інформацію про minimalStep.amount
@@ -526,14 +527,12 @@ Login
 Отримати інформацію про value.currency
   ${valueCurrency}=       отримати текст із поля і показати на сторінці    value.currency
   ${valueCurrency}=       Get Substring     ${valueCurrency}    -4      -1
-  Log To Console          ${valueCurrency}
   [Return]   ${valueCurrency}
 
 # NDS
 Отримати інформацію про value.valueAddedTaxIncluded
   ${return_value}=   отримати текст із поля і показати на сторінці   value.valueAddedTaxIncluded
   ${return_value}=   convert_nt_string_to_common_string      ${return_value}
-  Log To Console        ${return_value}
   [Return]  ${return_value}
 
 # Name of auction creator
@@ -573,9 +572,7 @@ Login
   ${description_raw}=   переглянути текст із поля і показати на сторінці   items[0].description
   ${description_1}=     Get Substring     ${description_raw}  0   11
   ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
-  ${description}=   catenate  ${description_1}  ${description_2}
-#  Log To Console    descr-1 - ${description_1}
-#  Log To Console    descr-2 - ${description_2}
+  ${description}=       Catenate  ${description_1}  ${description_2}
   [Return]  ${description}
 
 отримати інформацію про items[1].description
@@ -583,9 +580,7 @@ Login
   ${description_raw}=   переглянути текст із поля і показати на сторінці   items[1].description
   ${description_1}=     Get Substring     ${description_raw}  0   11
   ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
-  ${description}=   catenate  ${description_1}  ${description_2}
-#  Log To Console    descr-1 - ${description_1}
-#  Log To Console    descr-2 - ${description_2}
+  ${description}=       Catenate  ${description_1}  ${description_2}
   [Return]  ${description}
 
 отримати інформацію про items[2].description
@@ -593,9 +588,7 @@ Login
   ${description_raw}=   переглянути текст із поля і показати на сторінці   items[2].description
   ${description_1}=     Get Substring     ${description_raw}  0   11
   ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
-  ${description}=   catenate  ${description_1}  ${description_2}
-#  Log To Console    descr-1 - ${description_1}
-#  Log To Console    descr-2 - ${description_2}
+  ${description}=       Catenate  ${description_1}  ${description_2}
   [Return]  ${description}
 # full scenario
 Отримати інформацію про eligibilityCriteria
@@ -612,7 +605,6 @@ Login
   ...      ${ARGUMENTS[2]} ==  item_id
   ...      ${ARGUMENTS[3]} ==  field_name
   Run Keyword And Return  Отримати інформацію із ${ARGUMENTS[3]}
-  Log to console    'Отримати інформацію із предмету'
 
 переглянути текст із поля і показати на сторінці
   [Arguments]   ${field_name}
@@ -624,12 +616,9 @@ Login
 # Відображення опису номенклатур тендера
   ${description_raw}=   Get text    xpath=//div[@ng-bind="item.description"(contains(text(), '${ARGUMENTS[2]}'))]
   Log To Console    item's descritpion text - ${description_raw}
-#  ${description_raw}=   переглянути текст із поля і показати на сторінці   items[0].description
-  ${description_1}=     Get Substring     ${description_raw}  0   11
-  ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
-  ${description}=   catenate  ${description_1}  ${description_2}
-  Log To Console    description -1 - ${description_1}
-  Log To Console    description -2 - ${description_2}
+  ${description_1}=    Get Substring     ${description_raw}  0   11
+  ${description_2}=    convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
+  ${description}=      Catenate  ${description_1}  ${description_2}
   [Return]  ${description}
 
 отримати інформацію із items[0].deliveryDate.endDate
@@ -650,12 +639,56 @@ Login
   [Return]  ${classificationScheme}
 
 отримати інформацію із classification.id
+  [Arguments]   @{arguments}
+  [Documentation]
+  ...           ${ARGUMENTS[0]} == user_role
+  ...           ${ARGUMENTS[1]} == auction_id
+  ...           ${ARGUMENTS[2]} == field_name   # example - items[0].classification.id
+  ${classification_id}=   переглянути текст із поля і показати на сторінці   ${ARGUMENTS[2]}
+  [Return]  ${classification_id.split(' - ')[0]}
+
+отримати інформацію про items[0].classification.id
   ${classification_id}=   переглянути текст із поля і показати на сторінці   items[0].classification.scheme
+  [Return]  ${classification_id.split(' - ')[0]}
+
+отримати інформацію про items[1].classification.id
+  ${classification_id}=   переглянути текст із поля і показати на сторінці   items[1].classification.scheme
+  [Return]  ${classification_id.split(' - ')[0]}
+
+отримати інформацію про items[2].classification.id
+  ${classification_id}=   переглянути текст із поля і показати на сторінці   items[2].classification.scheme
   [Return]  ${classification_id.split(' - ')[0]}
 
 отримати інформацію із classification.description
 #  Відображення опису класифікації номенклатур тендера
+  [Arguments]   @{arguments}
+  [Documentation]
+  ...           ${ARGUMENTS[0]} == user_role
+  ...           ${ARGUMENTS[1]} == auction_id
+  ...           ${ARGUMENTS[2]} == field_name   # example - items[0].classification.description
+  ${classification_description_raw}=   Get Webelement     xpath=//div[contains(text(), '${ARGUMENTS[1]}')]
+  ${classification_description}=       Get Text           ${classification_description_raw}
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
+  Log To Console        ${classification_description}
+  [Return]      ${classification_description}
+
+отримати інформацію про items[0].classification.description
+#  Відображення опису класифікації номенклатур тендера
   ${classification_description_raw}=   переглянути текст із поля і показати на сторінці   items[0].classification.scheme
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
+  Log To Console        ${classification_description}
+  [Return]      ${classification_description}
+
+отримати інформацію про items[1].classification.description
+#  Відображення опису класифікації номенклатур тендера
+  ${classification_description_raw}=   переглянути текст із поля і показати на сторінці   items[1].classification.scheme
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
+  Log To Console        ${classification_description}
+  [Return]      ${classification_description}
+
+отримати інформацію про items[2].classification.description
+#  Відображення опису класифікації номенклатур тендера
+  ${classification_description_raw}=   переглянути текст із поля і показати на сторінці   items[2].classification.scheme
   ${classification_description}=       Get Substring      ${classification_description_raw}     13
   Log To Console        ${classification_description}
   [Return]      ${classification_description}
@@ -669,8 +702,37 @@ Login
 Отримати інформацію про unit.code
   Fail  Не реалізований функціонал
 
+Отримати інформацію про items[0].unit.code
+  Fail  Не реалізований функціонал
+
+Отримати інформацію про items[1].unit.code
+  Fail  Не реалізований функціонал
+
+Отримати інформацію із unit.code
+  Fail  Не реалізований функціонал
+
 отримати інформацію із quantity
+  [Arguments]   @{Arguments}
+  [Documentation]
+  ...           ${ARGUMENTS[0]} == user_role
+  ...           ${ARGUMENTS[1]} == auction_id
+  ...           ${ARGUMENTS[2]} == field_name   # example - items[0].quantity
+  ${quantity}=   переглянути текст із поля і показати на сторінці   ${ARGUMENTS[2]}
+  ${quantity}=   Convert To Integer   ${quantity}
+  [Return]  ${quantity}
+
+отримати інформацію про items[0].quantity
   ${quantity}=   переглянути текст із поля і показати на сторінці   items[0].quantity
+  ${quantity}=   Convert To Integer   ${quantity}
+  [Return]  ${quantity}
+
+отримати інформацію про items[1].quantity
+  ${quantity}=   переглянути текст із поля і показати на сторінці   items[1].quantity
+  ${quantity}=   Convert To Integer   ${quantity}
+  [Return]  ${quantity}
+
+отримати інформацію про items[2].quantity
+  ${quantity}=   переглянути текст із поля і показати на сторінці   items[2].quantity
   ${quantity}=   Convert To Number   ${quantity}
   [Return]  ${quantity}
 
@@ -782,14 +844,14 @@ Login
   [Documentation]
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == ${TENDER_UAID}
-  Reload Page\
+  Reload Page
 
 Отримати кількість документів в тендері
   [Arguments]   @{ARGUMENTS}
   Log To Console    arg-0 - ${ARGUMENTS[0]}
   Reload Page
   Sleep     2
-  Wait Until Page Contains      xpath=//a[@ui-sref="tenderView.overview"]
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'     Wait Until Page Contains      xpath=//a[@ui-sref="tenderView.overview"]
   Click Element     xpath=//a[@ui-sref="tenderView.overview"]
   Sleep     2
   ${docs_amount}=   Get Matching Xpath Count    xpath=//div[@ng-repeat="document in documentsSection | versionFilter | orderBy:'-dateModified'"]
@@ -807,32 +869,63 @@ Login
   ...      ${ARGUMENTS[1]} ==  tender_uaid
   ...      ${ARGUMENTS[2]} ==  item_id    # Something like this - q-e5b21059
   ...      ${ARGUMENTS[3]} ==  field_name
-  Run Keyword And Return  Отримати інформацію про Questions.${ARGUMENTS[3]}
+  Run Keyword And Return  Отримати інформацію про Questions.${ARGUMENTS[3]}  ${ARGUMENTS[2]}
 
 Отримати інформацію про Questions.answer
-  Reload Page
-  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
-  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  [Arguments]   @{ARGUMENTS}
+  Log to console    arg-0 - ${ARGUMENTS[0]}
   Reload Page
   Sleep     2
-  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
-  ${resp}=   Get Text   ${title[-1]}
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     10
+  Reload Page
+  Sleep     10
+  ${title}=     Get Webelement     xpath=//div[@ng-repeat="question in questions"][contains(., '${ARGUMENTS[0]}')]//span[@class="answer-description ng-binding"]
+#  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title}
   Log To Console    ${resp}
   [Return]  ${resp}
 
-Отримати інформацію про Questions[1].answer
+Отримати інформацію про questions[0].answer
   Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
   Reload Page
   Sleep     2
   ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
-  ${resp}=   Get Text   ${title[-1]}
+  ${resp}=   Get Text   ${title[1]}
+  Log To Console    ${resp}
+  [Return]  ${resp}
+
+Отримати інформацію про questions[1].answer
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title[2]}
+  Log To Console    ${resp}
+  [Return]  ${resp}
+
+Отримати інформацію про questions[2].answer
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title[3]}
   Log To Console    ${resp}
   [Return]  ${resp}
 
 отримати інформацію про Questions.title
   [Arguments]    @{arguments}
+  Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   Sleep     2
@@ -852,6 +945,11 @@ Login
   [Return]  ${description.split(': ')[-1]}
 
 отримати інформацію про Questions[0].title
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
   Sleep     2
   ${title_description}=     Get Webelements     xpath=//span[@class="user ng-binding"]
   ${title}=     Get Text    ${title_description[0]}
@@ -859,18 +957,19 @@ Login
   [Return]  ${title}
 
 отримати інформацію про Questions[0].description
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
   Sleep     2
   ${question_description}=     Get Webelements  xpath=//span[@class="question-description ng-binding"]
   ${description}=   Get Text    ${question_description[0]}
   Log To Console    q_descr - ${description}
   [Return]  ${description}
-#  Additional piece of code
-#  ${title_description}=     Get Webelement     xpath=//div[@class="col-xs-10 col-sm-10"][contains(., '${object_id}')]
-#  ${description}=   Get Text   ${title_description}
-#  Log To Console    description - 1 - ${description.split(': ')[-1]}
-#  [Return]  ${description.split(': ')[-1]}
 
 отримати інформацію про Questions[1].title
+  Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   Sleep     2
@@ -880,7 +979,7 @@ Login
   ${resp}=   Get Text   ${title[1]}
   Log To Console    ${resp}
   [Return]  ${resp}
-#
+
 отримати інформацію про Questions[1].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[1]}
@@ -888,6 +987,7 @@ Login
   [Return]  ${resp}
 
 отримати інформацію про Questions[2].title
+  Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   Sleep     2
@@ -897,7 +997,7 @@ Login
   ${resp}=   Get Text   ${title[2]}
   Log To Console    ${resp}
   [Return]  ${resp}
-#
+
 отримати інформацію про Questions[2].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[2]}
@@ -905,6 +1005,7 @@ Login
   [Return]  ${resp}
 
 отримати інформацію про Questions[3].title
+  Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
   Sleep     2
@@ -914,7 +1015,7 @@ Login
   ${resp}=   Get Text   ${title[3]}
   Log To Console    ${resp}
   [Return]  ${resp}
-#
+
 отримати інформацію про Questions[3].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[3]}
@@ -951,6 +1052,24 @@ Login
    Input Text       xpath=//textarea[@ng-model="chatData.message"]   ${answer}
    Click Element    xpath=//button[@ng-click="sendAnswer()"]
    Sleep    2
+
+# :TODO - check for correct work - Viewer
+Отримати інформацію із документа по індексу
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...       ${ARGUMENTS[0]} ==  user_role
+  ...       ${ARGUMENTS[1]} ==  auction_id
+  ...       ${ARGUMENTS[2]} ==  index
+  Log To Console    arg-0 - ${ARGUMENTS[0]}
+  Log To Console    arg-1 - ${ARGUMENTS[1]}
+  Log To Console    arg-2 - ${ARGUMENTS[2]}
+  ${documents}=     Get Webelements     xpath=//div[@class="type bold ng-scope"]
+  ${document_type}=     Get Text    ${documents[${ARGUMENTS[2]}]}
+  ${description}=   convert to string    ${document_type.split(' / ')[-1]}
+  Run Keyword And Return If   u'${description}' == u'Юридична Інформація Майданчиків'   convert_nt_string_to_common_string   ${description}
+  Log To Console    doc text = ${document_type}
+  Log To Console    doc type = ${description}
+  [Return]      ${document_type}
 
 # =======================================
 #       Question interaction end
@@ -1425,14 +1544,19 @@ Accept Protocol
   Log To Console    ${text}
   [Return]          ${text}
 
-# :TODO - check for correct work
+# :TODO - check for correct work for viewer
 Отримати інформацію із документа    # Document Title
-  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
+  [Arguments]  @{ARGUMENTS}
+  Log To Console    arg-0 - ${ARGUMENTS[0]}
+  Log To Console    arg-1 - ${ARGUMENTS[1]}
+  Log To Console    arg-2 - ${ARGUMENTS[2]}
+  Log To Console    arg-3 - ${ARGUMENTS[3]}
+  # ${username}  ${tender_uaid}  ${doc_id}  ${field}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Sleep     3
-  Wait Until Page Contains Element  xpath=//a[@class="ng-binding"]
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Wait Until Page Contains Element   xpath=//a[@class="ng-binding"]
   Sleep     2
-  ${title}=   Get Text   xpath=//a[contains(text(), '${doc_id}')]
+  ${title}=   Get Text   xpath=//a[contains(text(), '${ARGUMENTS[2]}')]
   Log To Console    ${title}
   [Return]  ${title}
 

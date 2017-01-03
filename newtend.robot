@@ -1,5 +1,5 @@
 *** Settings ***
-Library  Selenium2Screenshots
+#Library  Selenium2Screenshots
 Library  Selenium2Library
 Library  String
 Library  DateTime
@@ -15,6 +15,7 @@ ${locator.minimalStep.amount}        id=step            # Minimal price step-up
 ${locator.step.percentage}           id=step-percent    # Step percentage
 ${locator.guaranteeamount}           id=guarantee-amount    # Amount of Bank guarantee
 # Item's locators
+${locator.edit.add_item}             xpath=//a[@ng-click="addField()"]
 ${locator.items[0].description}      id=itemDescription0     # Description of Item (Lot in Auctions)
 ${locator.items[0].quantity}         id=quantity0
 ${locator.items[0].unit.name}        id=measure-list
@@ -35,6 +36,8 @@ ${locator.view.status}               xpath=//span[@class="status ng-binding"]
 ${locator.view.title}                id=view-tender-title
 ${locator.view.description}          id=view-tender-description
 ${locator.view.dgfID}                id=view-tender-dgfID
+${locator.dgfDecisionID}             id=view-tender-dgfDecisionID
+${locator.view.dgfDecisionID}        id=view-tender-dgfDecisionID
 ${locator.view.value.amount}         id=view-tender-value
 ${locator.view.minimalStep.amount}   id=step
 ${locator.view.tenderPeriod.startDate}      id=start-date-registration
@@ -46,14 +49,24 @@ ${locator.view.items[0].deliveryDate.endDate}   id=end-date-delivery
 ${locator.view.procuringEntity.name}        id=view-customer-name
 ${locator.view.items[0].deliveryAddress}    id=deliveryAddress
 ${locator.view.items[0].classification.scheme.title}  xpath=//label[@for="classifier-0"]   # id=classifier-0
+${locator.view.items[1].classification.scheme.title}  xpath=//label[@for="classifier-1"]   # id=classifier-0
+${locator.view.items[2].classification.scheme.title}  xpath=//label[@for="classifier-2"]   # id=classifier-0
 ${locator.view.items[0].classification.scheme}        id=classifier-0
+${locator.view.items[1].classification.scheme}        id=classifier-1
+${locator.view.items[2].classification.scheme}        id=classifier-2
 ${locator.view.items[0].classification.id}            id=classifier-0
+${locator.view.items[1].classification.id}            id=classifier-1
+${locator.view.items[2].classification.id}            id=classifier-2
 ${locator.view.QUESTIONS[0].title}          xpath=//span[@class="user ng-binding"]
 ${locator.view.QUESTIONS[0].description}    xpath=//span[@class="question-description ng-binding"]
 ${locator.view.QUESTIONS[0].date}           xpath=//span[@class="date ng-binding"]
 ${locator.view.items[0].unit.name}          xpath=//span[@class="unit ng-binding"]
 ${locator.view.items[0].quantity}           id=quantity-0
+${locator.view.items[1].quantity}           id=quantity-1
+${locator.view.items[2].quantity}           id=quantity-2
 ${locator.view.items[0].description}        id=view-item-description-0
+${locator.view.items[1].description}        id=view-item-description-1
+${locator.view.items[2].description}        id=view-item-description-2
 ${locator.view.auctionId}                   xpath=//a[@class="ng-binding ng-scope"]
 ${locator.view.value.valueAddedTaxIncluded}         xpath=//label[@for="with-nds"]
 ${locator.view.value.currency}              xpath=//label[@for="budget"]
@@ -106,22 +119,9 @@ Login
   ${budget}=        Get From Dictionary   ${ARGUMENTS[1].data.value}         amount
   ${guarantee}=     Get From Dictionary   ${ARGUMENTS[1].data.guarantee}     amount
   ${step_rate}=     Get From Dictionary   ${ARGUMENTS[1].data.minimalStep}   amount
-  #  Items block info
-  ${items}=                                Get From Dictionary         ${ARGUMENTS[1].data}                   items
-  ${item0}=                                Get From List               ${items}                               0
-  ${item_description}=                     Get From Dictionary         ${item0}                               description
-  ${item_quantity}=                        Get From Dictionary         ${item0}                               quantity
-  ${unit_code}=                            Get From Dictionary         ${item0.unit}                          code
-  ${unit_name}=                            Get From Dictionary         ${item0.unit}                          name
-  ${classification_scheme}=                Get From Dictionary         ${item0.classification}                scheme
-  ${classification_description}=           Get From Dictionary         ${item0.classification}                description
-  ${classification_id}=                    Get From Dictionary         ${item0.classification}                id
-  ${deliveryaddress_postalcode}=           Get From Dictionary         ${item0.deliveryAddress}               postalCode
-  ${deliveryaddress_countryname}=          Get From Dictionary         ${item0.deliveryAddress}               countryName
-  ${deliveryaddress_streetaddress}=        Get From Dictionary         ${item0.deliveryAddress}               streetAddress
-  ${deliveryaddress_region}=               Get From Dictionary         ${item0.deliveryAddress}               region
-  ${deliveryaddress_locality}=             Get From Dictionary         ${item0.deliveryAddress}               locality
-
+  ${dgfDecisionID}=     Get From Dictionary   ${ARGUMENTS[1].data}        dgfDecisionID
+  ${dgfDecisionDate}=   Get From Dictionary   ${ARGUMENTS[1].data}        dgfDecisionDate
+  ${tenderAttempts}=    Get From Dictionary   ${ARGUMENTS[1].data}        tenderAttempts
 
 # Date of auction start
   ${start_date}=    Get From Dictionary   ${ARGUMENTS[1].data.auctionPeriod}    startDate
@@ -139,6 +139,13 @@ Login
   Input Text   ${locator.title}              ${title}
   Input Text   ${locator.description}        ${description}
   Input Text   ${locator.dgfid}              ${dgfID}
+# New fields add
+  Input Text   xpath=//input[@id="tender-dgfDecisionID"]    ${dgfDecisionID}
+  Input Text   xpath=//input[@id="tender-dgfDecisionDate"]  ${dgfDecisionDate}
+  ${tender_attempts}=   Convert To String   ${tenderAttempts}
+  Log To Console    attempts - '${tender_attempts}'
+  Select From List By Value   xpath=//select[@id="tenderAttempts"]    ${tender_attempts}
+
   ${budget_string}      Convert To String    ${budget}
   Input Text   ${locator.value.amount}       ${budget_string}
   Click Element    id=with-nds
@@ -146,27 +153,65 @@ Login
   Input Text   ${locator.minimalStep.amount}  ${step_rate_string}
   ${guarantee_string}   Convert To String     ${guarantee}
   Input Text    ${locator.guaranteeamount}    ${guarantee_string}
-# Add Item(s)
-  Input Text    ${locator.items[0].description}     ${item_description}
-  Input Text    ${locator.items[0].quantity}        ${item_quantity}
-  click Element   ${locator.items[0].unit.name}
-  click Element   xpath=//a[contains(text(), '${unit_name}')]
-# Selecting classifier
-  Click Element     ${locator.items[0].classification.scheme}
-  Sleep     5
-  Input Text        id=classifier-search-field    ${classification_id}
-  Sleep     5
-  Click Element     xpath=//span[contains(text(), '${classification_id}')]
-  Click Element     id=select-classifier-btn
 
+#  Items block info
+# === Loop Try to select items info ===
+  ${item_number}=   evaluate              ${NUMBER_OF_ITEMS} - 1
+  ${item_number}=   Convert To Integer    ${item_number}
+  log to console    number of items - 1 = '${item_number}'
+  : FOR   ${INDEX}  IN RANGE    0    ${NUMBER_OF_ITEMS}
+  \   ${items}=         Get From Dictionary   ${ARGUMENTS[1].data}            items
+  \   ${item[x]}=                              Get From List               ${items}                 ${INDEX}
+  \   ${item_description}=                  Get From Dictionary         ${item[x]}     description
+  \   Log to Console    item-0-description '${INDEX}' - '${item_description}'
+  \   ${item_quantity}=                     Get From Dictionary         ${item[x]}     quantity
+  \   ${unit}=                              Get From Dictionary         ${item[x]}     unit
+  \   ${unit_code}=                         Get From Dictionary         ${unit}        code
+  \   Log to console      unit code - ${unit_code}
+  \   ${unit_name}=                         Get From Dictionary         ${unit}        name
+  \   ${classification}=                    Get From Dictionary         ${item[x]}     classification
+  \   ${classification_scheme}=             Get From Dictionary         ${classification}    scheme
+  \   ${classification_description}=        Get From Dictionary         ${classification}    description
+  \   ${classification_id}=                 Get From Dictionary         ${classification}    id
+  \   ${deliveryaddress}=                   Get From Dictionary         ${item[x]}           deliveryAddress
+  \   ${deliveryaddress_postalcode}=        Get From Dictionary         ${deliveryaddress}   postalCode
+  \   ${deliveryaddress_countryname}=       Get From Dictionary         ${deliveryaddress}   countryName
+  \   ${deliveryaddress_streetaddress}=     Get From Dictionary         ${deliveryaddress}   streetAddress
+  \   ${deliveryaddress_region}=            Get From Dictionary         ${deliveryaddress}   region
+  \   ${deliveryaddress_locality}=          Get From Dictionary         ${deliveryaddress}   locality
+#  === Seems to be working -^- Loop for getting the values from Dictionary ===
+# Add Item(s)
+  \   ${item_descr_field}=   Get Webelements     xpath=//input[@ng-model="item.description"]
+  \   Input Text    ${item_descr_field[-1]}     ${item_description}
+  \   ${item_quantity_field}=   Get Webelements     xpath=//input[@ng-model="item.quantity"]
+  \   Input Text    ${item_quantity_field[-1]}        ${item_quantity}
+  \   ${unit_name_field}=     Get Webelements     xpath=//a[@id="measure-list"]
+  \   Focus   ${unit_name_field[-1]}
+  \   Click Element   ${unit_name_field[-1]}
+  \   Sleep     2
+  \   ${need_measure}=   Get Webelements    xpath=//a[contains(text(), '${unit_name}')]
+  \   Click Element   ${need_measure[-1]}
+# Selecting classifier
+  \   ${classifier_field}=      Get Webelements     xpath=//input[@ng-model="item.classification.field"]
+  \   Click Element     ${classifier_field[-1]}
+  \   Sleep     5
+  \   Input Text        id=classifier-search-field    ${classification_id}
+  \   Sleep     5
+  \   Click Element     xpath=//span[contains(text(), '${classification_id}')]
+  \   Click Element     id=select-classifier-btn
+  \   Sleep     2
 # Add delivery address
-  Click Element     ${locator.items[0].deliveryAddress}
-  Sleep     2
-  Input Text        ${locator.delivery_zip}      ${deliveryaddress_postalcode}
-  Input Text        ${locator.delivery_region}   ${deliveryaddress_region}
-  Input Text        ${locator.delivery_town}     ${deliveryaddress_locality}
-  Input Text        ${locator.delivery_address}  ${deliveryaddress_streetaddress}
-  Click Element     ${locator.delivery_save}
+  \   ${delivery_field}=    Get Webelements     xpath=//input[@ng-model="item.address.field"]
+  \   Click Element     ${delivery_field[-1]}
+  \   Sleep     2
+  \   Input Text        ${locator.delivery_zip}      ${deliveryaddress_postalcode}
+  \   Input Text        ${locator.delivery_region}   ${deliveryaddress_region}
+  \   Input Text        ${locator.delivery_town}     ${deliveryaddress_locality}
+  \   Input Text        ${locator.delivery_address}  ${deliveryaddress_streetaddress}
+  \   Click Element     ${locator.delivery_save}
+  \   Sleep     3
+  \   ${new_item_cross}=    Get Webelements     xpath=//a[@ng-click="addField()"]
+  \   Run Keyword If   '${INDEX}' < '${item_number}'   Click Element    ${new_item_cross[-1]}
 
 # Auction Start date block
   ${start_date_date}  Get Substring   ${start_date}    0   10
@@ -184,16 +229,6 @@ Login
   Wait Until Page Contains Element   xpath=//div[@class="title"]   30
   ${tender_uaid}=         Get Text   xpath=//div[@class="title"]
   [Return]  ${TENDER_UAID}
-
-
-Додати багато придметів
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  items
-  ${Items_length}=     Get Length   ${items}
-  : FOR    ${INDEX}    IN RANGE    1    ${Items_length}
-  \   Click Element    ${locator.edit.add_item}
-  \   Додати придмет   ${items[${INDEX}]}   ${INDEX}
 
 # ===================================
 #       Docs Upload
@@ -215,7 +250,7 @@ Login
   Log To Console    'Interacting with documents modal window'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
   Log To Console    'Specify document type'
-  Select From List By Value    xpath=//select[@id="documentType"]      notice
+  Select From List By Value    xpath=//select[@id="documentType"]      tenderNotice
   Sleep     2
   Log To Console    'Inserting document'
   # === Mega Hack for document Upload ===
@@ -232,6 +267,7 @@ Login
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${image_path}
+  Log To Console    arg-2 - ${ARGUMENTS[2]}
   # Navigating to documents tab
   Reload Page
   Sleep     2
@@ -268,20 +304,105 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism - Illustration
-  Log To Console    'Interacting with documents modal window - Illustation'
+  Log To Console    'Interacting with documents modal window - VDR'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
   Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      virtualDataRoom
   Sleep     2
   Log To Console    'Inserting VDR'
-  Input Text    xpath=//input[@id="auction-vdr-url"]    ${ARGUMENTS[2]}
-  Input Text    xpath=//input[@id="auction-vdr-title"]  ${ARGUMENTS[2]}
+  Input Text    xpath=//input[@id="auction-documnet-title"]    ${ARGUMENTS[2]}
+  Input Text    xpath=//input[@id="document-url"]  ${ARGUMENTS[2]}
   # === Mega Hack for document Upload ===
   # Confirm file Upload
   Click Element     xpath=//button[@ng-click="upload()"]
   Sleep     10
-# ======= Docs Upload ===============
 
+Додати публічний паспорт активу
+# This is Link for Document, but not document as is
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  ${image_path}
+  # Navigating to documents tab
+  Reload Page
+  Sleep     2
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  # Interacting with document upload mechanism - Illustration
+  Log To Console    'Interacting with documents modal window - Public Passport'
+  Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      x_dgfPublicAssetCertificate
+#  Select From List By Value    xpath=//select[@id="documentType"]      technicalSpecifications
+  Sleep     2
+  Log To Console    'Inserting document'
+  Input Text    xpath=//input[@id="auction-documnet-title"]     ${ARGUMENTS[2]}
+  Sleep     2
+  Input Text    xpath=//input[@id="document-url"]     ${ARGUMENTS[2]}
+  Sleep     2
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     10
+
+Додати офлайн документ
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  file_description
+  # Navigating to documents tab
+  Reload Page
+  Sleep     2
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  # Interacting with document upload mechanism - Illustration
+  Log To Console    'Interacting with documents modal window - Illustation'
+  Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      x_dgfAssetFamiliarization
+  Sleep     2
+  Log To Console    'Inserting document'
+  # === Mega Hack for document Upload ===
+  Input Text    xpath=//input[@id="auction-documnet-title"]    ${ARGUMENTS[2]}
+  Input Text    xpath=//textarea[@id="auction-documnet-accessDetails"]    ${ARGUMENTS[2]}
+  Sleep     2
+  # Confirm file Upload
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     10
+
+Завантажити документ в тендер з типом
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  ${image_path}
+  ...      ${ARGUMENTS[3]} ==  document_type
+  # Navigating to documents tab
+  Reload Page
+  Sleep     2
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
+  # Interacting with document upload mechanism - Illustration
+  Log To Console    'Interacting with documents modal window - '${ARGUMENTS[3]}''
+  Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
+  Log To Console    'Specify document type'
+  Select From List By Value    xpath=//select[@id="documentType"]      ${ARGUMENTS[3]}
+  Sleep     2
+  Log To Console    'Inserting document'
+  # === Mega Hack for document Upload ===
+  Execute Javascript  $('button[ng-model="file"]').click()
+  Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+  Sleep     2
+  # Confirm file Upload
+  Click Element     xpath=//button[@ng-click="upload()"]
+  Sleep     10
+# ======= Docs Upload ===============
 
 Пошук тендера по ідентифікатору
   [Arguments]  @{ARGUMENTS}
@@ -305,96 +426,165 @@ Login
   Sleep     2
 
 # ====Newtend===========
-отримати інформацію із тендера
+Отримати кількість предметів в тендері
+  [Arguments]  @{ARGUMENTS}
+  Reload Page
+  Sleep     2
+  Wait Until Page Contains Element    xpath=//a[@ui-sref="tenderView.overview"]     20
+  Click Element      xpath=//a[@ui-sref="tenderView.overview"]
+  Sleep     2
+  ${items_number}=   Get Matching Xpath Count    xpath=//div[@ng-bind="item.description"]
+  Log To Console   Items number - '${items_number}'
+  [Return]  ${items_number}
+
+Додати предмет закупівлі
+  [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...     ${ARGUMENTS[0]} == username
+  ...     ${ARGUMENTS[1]} == auction_uaid
+  ...     ${ARGUMENTS[2]} == item_info
+  Log To Console    arg-0 - ${ARGUMENTS[0]}
+
+Видалити предмет закупівлі
+  [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...     ${ARGUMENTS[0]} == username
+  ...     ${ARGUMENTS[1]} == auction_uaid
+  ...     ${ARGUMENTS[2]} == item_id
+  Log To Console    arg-0 - ${ARGUMENTS[0]}
+
+
+Отримати інформацію із тендера
   [Arguments]  @{ARGUMENTS}
   [Documentation]
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  tender_uaid
   ...      ${ARGUMENTS[2]} ==  field_name
-  Switch browser   ${ARGUMENTS[0]}
   Run Keyword And Return  Отримати інформацію про ${ARGUMENTS[2]}
 
-отримати текст із поля і показати на сторінці
+Отримати текст із поля і показати на сторінці
   [Arguments]   ${field_name}
   Sleep  2
   ${return_value}=   Get Text  ${locator.view.${field_name}}
   [Return]  ${return_value}
 
-отримати інформацію про title
-  ${title}=   отримати текст із поля і показати на сторінці   title
+Отримати інформацію про title
+  ${title}=   Отримати текст із поля і показати на сторінці   title
   [Return]  ${title}
 
 Отримати інформацію про status
   Reload page
-  ${return_value}=   отримати текст із поля і показати на сторінці   status
+  ${return_value}=   Отримати текст із поля і показати на сторінці   status
   ${return_value}=   convert_nt_string_to_common_string     ${return_value}
   Log To Console     ${return_value}
   [Return]  ${return_value}
 
-отримати інформацію про description
-  ${description}=   отримати текст із поля і показати на сторінці   description
+Отримати інформацію про description
+  ${description}=   Отримати текст із поля і показати на сторінці   description
   [Return]  ${description}
 
-отримати інформацію про dgfID
-  ${description}=   отримати текст із поля і показати на сторінці   dgfID
+Отримати інформацію про dgfDecisionID
+  ${dgfDecisionID_full}=   Get Text      xpath=//div[@id="view-tender-dgfDecisionID"]
+  [Return]      ${dgfDecisionID_full.split(u"№")[-1]}
+
+Отримати інформацію про dgfID
+  ${description}=   Отримати текст із поля і показати на сторінці   dgfID
   [Return]   ${description}
 
-отримати інформацію про auctionId
-  ${auctionId}=   отримати текст із поля і показати на сторінці   auctionId
+Отримати інформацію про dgfDecisionDate
+  ${date_text}=    Get Text      xpath=//div[@id="view-tender-dgfDecisionID"]
+  ${date}=    Get Substring      ${date_text}   4   14
+  [Return]    ${date}
+
+Отримати інформацію про tenderAttempts
+  ${attempts_raw}=  Get Text    xpath=//div[@id="tenderAttempts"]
+  ${attempts_value}=   Get Substring   ${attempts_raw}     -2    -1
+  ${attempts}=   Convert To Integer     ${attempts_value}
+  [Return]      ${attempts}
+
+Отримати інформацію про auctionId
+  ${auctionId}=   Отримати текст із поля і показати на сторінці   auctionId
   [Return]  ${auctionId}
 
-отримати інформацію про value.amount
-  ${valueAmount}=   отримати текст із поля і показати на сторінці   value.amount
+Отримати інформацію про value.amount
+  ${valueAmount}=   Отримати текст із поля і показати на сторінці   value.amount
   ${valueAmount}=   Convert To Number   ${valueAmount.split(' ')[0]}
-  Log To Console    value amount - ${valueAmount}
   [Return]  ${valueAmount}
 
-отримати інформацію про minimalStep.amount
-  ${minimalStepAmount}=   отримати текст із поля і показати на сторінці   minimalStep.amount
+Отримати інформацію про minimalStep.amount
+  ${minimalStepAmount}=   Отримати текст із поля і показати на сторінці   minimalStep.amount
   ${minimalStepAmount}=   Convert To Number   ${minimalStepAmount.split(' ')[0]}
   [Return]  ${minimalStepAmount}
 
 Отримати інформацію про value.currency
-  ${valueCurrency}=       отримати текст із поля і показати на сторінці    value.currency
+  ${valueCurrency}=       Отримати текст із поля і показати на сторінці    value.currency
   ${valueCurrency}=       Get Substring     ${valueCurrency}    -4      -1
-  Log To Console          ${valueCurrency}
   [Return]   ${valueCurrency}
 
 # NDS
 Отримати інформацію про value.valueAddedTaxIncluded
-  ${return_value}=   отримати текст із поля і показати на сторінці   value.valueAddedTaxIncluded
+  ${return_value}=   Отримати текст із поля і показати на сторінці   value.valueAddedTaxIncluded
   ${return_value}=   convert_nt_string_to_common_string      ${return_value}
-  Log To Console        ${return_value}
   [Return]  ${return_value}
 
 # Name of auction creator
-отримати інформацію про procuringEntity.name
-  ${procuringEntity_name}=   отримати текст із поля і показати на сторінці   procuringEntity.name
+Отримати інформацію про procuringEntity.name
+  ${procuringEntity_name}=   Отримати текст із поля і показати на сторінці   procuringEntity.name
   Log To Console  ${procuringEntity_name}
   [Return]  ${procuringEntity_name}
 
-отримати інформацію про enquiryPeriod.endDate
-  ${enquiryPeriodEndDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.endDate
+Отримати інформацію про procurementMethodType
+  ${type_titles}=   Get Webelements     xpath=//div[@class="title"]
+  ${procurementType_text}=   Get Text   ${type_titles[-1]}
+  ${procurementMethodType}=  convert_nt_string_to_common_string   ${procurementType_text}
+  Log To Console  ${procurementMethodType}
+  [Return]  ${procurementMethodType}
+
+Отримати інформацію про enquiryPeriod.endDate
+  ${enquiryPeriodEndDate}=   Отримати текст із поля і показати на сторінці   enquiryPeriod.endDate
   [Return]  ${enquiryPeriodEndDate}
 
-отримати інформацію про tenderPeriod.startDate
-  ${tenderPeriodStartDate}=   отримати текст із поля і показати на сторінці   tenderPeriod.startDate
+Отримати інформацію про tenderPeriod.startDate
+  ${tenderPeriodStartDate}=   Отримати текст із поля і показати на сторінці   tenderPeriod.startDate
   [Return]  ${tenderPeriodStartDate}
 
-отримати інформацію про tenderPeriod.endDate
-  ${tenderPeriodEndDate}=   отримати текст із поля і показати на сторінці   tenderPeriod.endDate
+Отримати інформацію про tenderPeriod.endDate
+  ${tenderPeriodEndDate}=   Отримати текст із поля і показати на сторінці   tenderPeriod.endDate
   Log To Console     ${tenderPeriodEndDate}
   ${return_value}=   get_time_with_offset   ${tenderPeriodEndDate}
   Log To Console     ${return_value}
   [Return]  ${return_value}
 
-отримати інформацію про enquiryPeriod.startDate
-  ${enquiryPeriodStartDate}=   отримати текст із поля і показати на сторінці   enquiryPeriod.StartDate
+Отримати інформацію про enquiryPeriod.startDate
+  ${enquiryPeriodStartDate}=   Отримати текст із поля і показати на сторінці   enquiryPeriod.StartDate
   [Return]  ${enquiryPeriodStartDate}
 
+Отримати інформацію про items[0].description
+# Відображення опису номенклатур тендера
+  ${description_raw}=   Переглянути текст із поля і показати на сторінці   items[0].description
+  ${description_1}=     Get Substring     ${description_raw}  0   11
+  ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
+  ${description}=       Catenate  ${description_1}  ${description_2}
+  [Return]  ${description}
+
+Отримати інформацію про items[1].description
+# Відображення опису номенклатур тендера
+  ${description_raw}=   Переглянути текст із поля і показати на сторінці   items[1].description
+  ${description_1}=     Get Substring     ${description_raw}  0   11
+  ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
+  ${description}=       Catenate  ${description_1}  ${description_2}
+  [Return]  ${description}
+
+Отримати інформацію про items[2].description
+# Відображення опису номенклатур тендера
+  ${description_raw}=   Переглянути текст із поля і показати на сторінці   items[2].description
+  ${description_1}=     Get Substring     ${description_raw}  0   11
+  ${description_2}=     convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
+  ${description}=       Catenate  ${description_1}  ${description_2}
+  [Return]  ${description}
 # full scenario
 Отримати інформацію про eligibilityCriteria
-  ${eligibilityCriteria}=   отримати текст із поля і показати на сторінці   eligibilityCriteria
+  ${eligibilityCriteria}=   Отримати текст із поля і показати на сторінці   eligibilityCriteria
   Log To Console            ${eligibilityCriteria}
   [Return]  ${eligibilityCriteria}
 
@@ -406,63 +596,131 @@ Login
   ...      ${ARGUMENTS[1]} ==  tender_uaid
   ...      ${ARGUMENTS[2]} ==  item_id
   ...      ${ARGUMENTS[3]} ==  field_name
-   Run Keyword And Return  Отримати інформацію із ${ARGUMENTS[3]}
+  Run Keyword And Return  Отримати інформацію із ${ARGUMENTS[3]}
 
-переглянути текст із поля і показати на сторінці
+Переглянути текст із поля і показати на сторінці
   [Arguments]   ${field_name}
   Sleep  1
   ${return_value}=   Get Text  ${locator.view.${field_name}}
   [Return]  ${return_value}
 
-отримати інформацію із description
+Отримати інформацію із description
 # Відображення опису номенклатур тендера
-  ${description_raw}=   переглянути текст із поля і показати на сторінці   items[0].description
-  ${description_1}=   Get Substring     ${description_raw}  0   11
-  ${description_2}=   convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
-  ${description}=   catenate  ${description_1}  ${description_2}
-  Log To Console    ${description_1}
-  Log To Console    ${description_2}
+  ${description_raw}=   Get text    xpath=//div[@ng-bind="item.description"(contains(text(), '${ARGUMENTS[2]}'))]
+  Log To Console    item's descritpion text - ${description_raw}
+  ${description_1}=    Get Substring     ${description_raw}  0   11
+  ${description_2}=    convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
+  ${description}=      Catenate  ${description_1}  ${description_2}
   [Return]  ${description}
 
-отримати інформацію із items[0].deliveryDate.endDate
-  ${deliveryDate_endDate}=   переглянути текст із поля і показати на сторінці   items[0].deliveryDate.endDate
+Отримати інформацію із items[0].deliveryDate.endDate
+  ${deliveryDate_endDate}=   Переглянути текст із поля і показати на сторінці   items[0].deliveryDate.endDate
   [Return]  ${deliveryDate_endDate}
 
-отримати інформацію про items[0].deliveryLocation.latitude
+Отримати інформацію про items[0].deliveryLocation.latitude
   Fail  Не реалізований функціонал
 
-отримати інформацію про items[0].deliveryLocation.longitude
+Отримати інформацію про items[0].deliveryLocation.longitude
   Fail  Не реалізований функціонал
 
 ##CAV
 Отримати інформацію із classification.scheme
 # Відображення схеми класифікації номенклатур тендера - CAV
-  ${classificationScheme_newtend}=   переглянути текст із поля і показати на сторінці   items[0].classification.scheme.title
+  ${classificationScheme_newtend}=   Переглянути текст із поля і показати на сторінці   items[0].classification.scheme.title
   ${classificationScheme}=           convert_nt_string_to_common_string      ${classificationScheme_newtend}
   [Return]  ${classificationScheme}
 
-отримати інформацію із classification.id
-  ${classification_id}=   переглянути текст із поля і показати на сторінці   items[0].classification.scheme
+Отримати інформацію із classification.id
+  [Arguments]   @{arguments}
+  [Documentation]
+  ...           ${ARGUMENTS[0]} == user_role
+  ...           ${ARGUMENTS[1]} == auction_id
+  ...           ${ARGUMENTS[2]} == field_name   # example - items[0].classification.id
+  ${classification_id}=   Переглянути текст із поля і показати на сторінці   ${ARGUMENTS[2]}
   [Return]  ${classification_id.split(' - ')[0]}
 
-отримати інформацію із classification.description
+Отримати інформацію про items[0].classification.id
+  ${classification_id}=   Переглянути текст із поля і показати на сторінці   items[0].classification.scheme
+  [Return]  ${classification_id.split(' - ')[0]}
+
+Отримати інформацію про items[1].classification.id
+  ${classification_id}=   Переглянути текст із поля і показати на сторінці   items[1].classification.scheme
+  [Return]  ${classification_id.split(' - ')[0]}
+
+Отримати інформацію про items[2].classification.id
+  ${classification_id}=   Переглянути текст із поля і показати на сторінці   items[2].classification.scheme
+  [Return]  ${classification_id.split(' - ')[0]}
+
+Отримати інформацію із classification.description
 #  Відображення опису класифікації номенклатур тендера
-  ${classification_description_raw}=   переглянути текст із поля і показати на сторінці   items[0].classification.scheme
+  [Arguments]   @{arguments}
+  [Documentation]
+  ...           ${ARGUMENTS[0]} == user_role
+  ...           ${ARGUMENTS[1]} == auction_id
+  ...           ${ARGUMENTS[2]} == field_name   # example - items[0].classification.description
+  ${classification_description_raw}=   Get Webelement     xpath=//div[contains(text(), '${ARGUMENTS[1]}')]
+  ${classification_description}=       Get Text           ${classification_description_raw}
   ${classification_description}=       Get Substring      ${classification_description_raw}     13
-  Log To Console        ${classification_description}
+  [Return]      ${classification_description}
+
+Отримати інформацію про items[0].classification.description
+#  Відображення опису класифікації номенклатур тендера
+  ${classification_description_raw}=   Переглянути текст із поля і показати на сторінці   items[0].classification.scheme
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
+  [Return]      ${classification_description}
+
+Отримати інформацію про items[1].classification.description
+#  Відображення опису класифікації номенклатур тендера
+  ${classification_description_raw}=   Переглянути текст із поля і показати на сторінці   items[1].classification.scheme
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
+  [Return]      ${classification_description}
+
+Отримати інформацію про items[2].classification.description
+#  Відображення опису класифікації номенклатур тендера
+  ${classification_description_raw}=   Переглянути текст із поля і показати на сторінці   items[2].classification.scheme
+  ${classification_description}=       Get Substring      ${classification_description_raw}     13
   [Return]      ${classification_description}
 
 ##item
-отримати інформацію із unit.name
-  ${unit_name}=   переглянути текст із поля і показати на сторінці   items[0].unit.name
+Отримати інформацію із unit.name
+  ${unit_name}=   Переглянути текст із поля і показати на сторінці   items[0].unit.name
   Run Keyword And Return If  '${unit_name}' == 'килограммы'   Convert To String   кілограм
   [Return]  ${unit_name}
 
 Отримати інформацію про unit.code
   Fail  Не реалізований функціонал
 
-отримати інформацію із quantity
-  ${quantity}=   переглянути текст із поля і показати на сторінці   items[0].quantity
+Отримати інформацію про items[0].unit.code
+  Fail  Не реалізований функціонал
+
+Отримати інформацію про items[1].unit.code
+  Fail  Не реалізований функціонал
+
+Отримати інформацію із unit.code
+  Fail  Не реалізований функціонал
+
+Отримати інформацію із quantity
+  [Arguments]   @{Arguments}
+  [Documentation]
+  ...           ${ARGUMENTS[0]} == user_role
+  ...           ${ARGUMENTS[1]} == auction_id
+  ...           ${ARGUMENTS[2]} == field_name   # example - items[0].quantity
+  ${quantity}=   Переглянути текст із поля і показати на сторінці   ${ARGUMENTS[2]}
+  ${quantity}=   Convert To Integer   ${quantity}
+  [Return]  ${quantity}
+
+Отримати інформацію про items[0].quantity
+  ${quantity}=   Переглянути текст із поля і показати на сторінці   items[0].quantity
+  ${quantity}=   Convert To Integer   ${quantity}
+  [Return]  ${quantity}
+
+Отримати інформацію про items[1].quantity
+  ${quantity}=   Переглянути текст із поля і показати на сторінці   items[1].quantity
+  ${quantity}=   Convert To Integer   ${quantity}
+  [Return]  ${quantity}
+
+Отримати інформацію про items[2].quantity
+  ${quantity}=   Переглянути текст із поля і показати на сторінці   items[2].quantity
   ${quantity}=   Convert To Number   ${quantity}
   [Return]  ${quantity}
 
@@ -549,11 +807,14 @@ Login
   Click Element                      xpath=//a[@ui-sref="tenderView.chat"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="askQuestion()"]   20
   Click Element                      xpath=//button[@ng-click="askQuestion()"]
+  Sleep     2
   Input Text      xpath=//input[@ng-model="chatData.title"]   ${title}
   Sleep     2
   Select From List By Label  xpath=//select[@name="questionOf"]    Предмет аукциона
   Sleep     2
-  Select From List   xpath=//select[@name="relatedItem"]
+  ${item_name}=     Get text    xpath=//option[contains(text(), '${ARGUMENTS[2]}')]
+  Log To Console    '${item_name}'
+  Select From List By Label  xpath=//select[@name="relatedItem"]   ${item_name}
   Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${description}
   Click Element   xpath=//button[@ng-click="sendQuestion()"]
   : FOR   ${INDEX}  IN RANGE    1   15
@@ -571,6 +832,18 @@ Login
   ...      ${ARGUMENTS[1]} == ${TENDER_UAID}
   Reload Page
 
+Отримати кількість документів в тендері
+  [Arguments]   @{ARGUMENTS}
+  Log To Console    arg-0 - ${ARGUMENTS[0]}
+  Reload Page
+  Sleep     2
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'     Wait Until Page Contains      xpath=//a[@ui-sref="tenderView.overview"]
+  Click Element     xpath=//a[@ui-sref="tenderView.overview"]
+  Sleep     2
+  ${docs_amount}=   Get Matching Xpath Count    xpath=//div[@ng-repeat="document in documentsSection | versionFilter | orderBy:'-dateModified'"]
+  Log To Console    Docs amount - ${docs_amount}
+  [Return]      ${docs_amount}
+
 # ==========================
 # Questions interaction
 # ==========================
@@ -582,32 +855,146 @@ Login
   ...      ${ARGUMENTS[1]} ==  tender_uaid
   ...      ${ARGUMENTS[2]} ==  item_id    # Something like this - q-e5b21059
   ...      ${ARGUMENTS[3]} ==  field_name
-  Run Keyword And Return  Отримати інформацію про Questions.${ARGUMENTS[3]}
+  Run Keyword And Return  Отримати інформацію про Questions.${ARGUMENTS[3]}  ${ARGUMENTS[2]}
 
 Отримати інформацію про Questions.answer
+  [Arguments]   @{ARGUMENTS}
+  Log to console    arg-0 - ${ARGUMENTS[0]}
+  Reload Page
+  Sleep     2
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     10
+  Reload Page
+  Sleep     10
+  ${title}=     Get Webelement     xpath=//div[@ng-repeat="question in questions"][contains(., '${ARGUMENTS[0]}')]//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title}
+  [Return]  ${resp}
+
+Отримати інформацію про questions[0].answer
   Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
   Reload Page
   Sleep     2
   ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
-  ${resp}=   Get Text   ${title[-1]}
-  Log To Console    ${resp}
+  ${resp}=   Get Text   ${title[1]}
   [Return]  ${resp}
 
-отримати інформацію про questions.title
+Отримати інформацію про questions[1].answer
+  Reload Page
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
   Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title[2]}
+  [Return]  ${resp}
+
+Отримати інформацію про questions[2].answer
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
+  ${resp}=   Get Text   ${title[3]}
+  [Return]  ${resp}
+
+Отримати інформацію про Questions.title
+  [Arguments]    @{arguments}
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelement     xpath=//span[contains(text(), '${ARGUMENTS[2]}')]
+  ${resp}=   Get Text   ${title}
+  [Return]  ${resp}
+
+Отримати інформацію про Questions.description
+  [Arguments]    @{arguments}
+  Sleep     2
+  ${title_description}=     Get Webelement     xpath=//div[@class="col-xs-10 col-sm-10"][contains(., '${ARGUMENTS[2]}')]
+  ${description}=   Get Text   ${title_description}
+  [Return]  ${description.split(': ')[-1]}
+
+Отримати інформацію про Questions[0].title
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title_description}=     Get Webelements     xpath=//span[@class="user ng-binding"]
+  ${title}=     Get Text    ${title_description[0]}
+  [Return]  ${title}
+
+Отримати інформацію про Questions[0].description
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${question_description}=     Get Webelements  xpath=//span[@class="question-description ng-binding"]
+  ${description}=   Get Text    ${question_description[0]}
+  [Return]  ${description}
+
+Отримати інформацію про Questions[1].title
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
   Reload Page
   Sleep     2
   ${title}=     Get Webelements     xpath=//span[@class="user ng-binding"]
-  ${resp}=   Get Text   ${title[-1]}
+  ${resp}=   Get Text   ${title[1]}
+  [Return]  ${resp}
+
+Отримати інформацію про Questions[1].description
+  ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
+  ${resp}=   Get Text   ${description[1]}
   Log To Console    ${resp}
   [Return]  ${resp}
 
-отримати інформацію про questions.description
+Отримати інформацію про Questions[2].title
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="user ng-binding"]
+  ${resp}=   Get Text   ${title[2]}
+  Log To Console    ${resp}
+  [Return]  ${resp}
+
+Отримати інформацію про Questions[2].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
-  ${resp}=   Get Text   ${description[-1]}
+  ${resp}=   Get Text   ${description[2]}
+  Log To Console    ${resp}
+  [Return]  ${resp}
+
+Отримати інформацію про Questions[3].title
+  Reload Page
+  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
+  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep     2
+  Reload Page
+  Sleep     2
+  ${title}=     Get Webelements     xpath=//span[@class="user ng-binding"]
+  ${resp}=   Get Text   ${title[3]}
+  Log To Console    ${resp}
+  [Return]  ${resp}
+
+Отримати інформацію про Questions[3].description
+  ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
+  ${resp}=   Get Text   ${description[3]}
   Log To Console    ${resp}
   [Return]  ${resp}
 
@@ -618,20 +1005,37 @@ Login
    ...      ${ARGUMENTS[1]} == ${tender_uaid}
    ...      ${ARGUMENTS[2]} == ${item_index} # smth strange
    ...      ${ARGUMENTS[3]} == ${answer_id}
+   Sleep    40          # :TODO check for correct syc and question show
    Reload Page
-   ${answer}=     Get From Dictionary  ${ARGUMENTS[2].data}  answer
+   ${answer}=     Get From Dictionary   ${ARGUMENTS[2].data}  answer
    Click Element        xpath=//a[@ui-sref="tenderView.chat"]
    Sleep    3
-   # Try to answer
-   ${answer_row}=   Get Webelements   xpath=//div[@ng-repeat="question in questions"]
-   Log To Console   ${answer_row[-1]}
-   Mouse Over       ${answer_row[-1]}    # should show answer btn
-   ${answer_round}=     Get Webelements     xpath=//div[@class="answer"]
-   Focus            ${answer_round[-1]}
-   Click Element    ${answer_round[-1]}
+   # Try to answer - try to find correct xpath for answering Round ((
+   ${answer_row}=   Get Webelement   xpath=//div[@class="col-xs-10 col-sm-10"][contains(., '${ARGUMENTS[3]}')]
+   Log To Console   ${answer_row}
+   Mouse Over       ${answer_row}    # should show answer btn
+   Sleep    1
+   ${answer_round}=     Get Webelement     xpath=//div[@class="answer mouseenter"]  # Interacting with answer btn
+   Sleep    1
+   Click Element    ${answer_round}
    Sleep    2
    Input Text       xpath=//textarea[@ng-model="chatData.message"]   ${answer}
    Click Element    xpath=//button[@ng-click="sendAnswer()"]
+   Sleep    2
+
+Отримати інформацію із документа по індексу
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...       ${ARGUMENTS[0]} ==  user_role
+  ...       ${ARGUMENTS[1]} ==  auction_id
+  ...       ${ARGUMENTS[2]} ==  index
+  ${documents}=     Get Webelements     xpath=//div[@class="type bold ng-scope"]
+  ${document_type}=     Get Text    ${documents[${ARGUMENTS[2]}]}
+  ${description}=   convert to string    ${document_type.split(' / ')[-1]}
+  Run Keyword And Return If   u'${description}' == u'Юридична Інформація Майданчиків'   convert_nt_string_to_common_string   ${description}
+  Log To Console    doc text = ${document_type}
+  Log To Console    doc type = ${description}
+  [Return]      ${document_type}
 
 # =======================================
 #       Question interaction end
@@ -673,7 +1077,6 @@ Login
   ${resp}=      Run Keyword If   'Можливість' in '${TEST NAME}'   Get text    xpath=//h3[@class="ng-binding"]
   Log To Console    response - ${resp}
   [Return]     ${resp}
-
 
 Скасувати цінову пропозицію
   [Arguments]  @{ARGUMENTS}
@@ -719,9 +1122,6 @@ Login
   [Documentation]
   ...    ${ARGUMENTS[0]} ==  file
   ...    ${ARGUMENTS[1]} ==  tenderId
-  Log to Console    arg_0 - ${ARGUMENTS[0]}
-  Log to Console    arg_1 - ${ARGUMENTS[1]}
-  Log to Console    arg_2 - ${ARGUMENTS[2]}
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
@@ -732,6 +1132,7 @@ Login
   Execute Javascript  $('button[ng-file-select=""]').click()
   Sleep     3
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
+  Sleep     2
   Click Element       xpath=//button[@ng-click="upload()"]
   Sleep     10
 
@@ -740,9 +1141,6 @@ Login
   [Documentation]
   ...    ${ARGUMENTS[1]} ==  file
   ...    ${ARGUMENTS[2]} ==  tenderId
-  Log to Console    arg_0 - ${ARGUMENTS[0]}
-  Log to Console    arg_1 - ${ARGUMENTS[1]}
-  Log to Console    arg_2 - ${ARGUMENTS[2]}
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element       xpath=//button[@ng-click="uploadDocument()"]
@@ -820,7 +1218,6 @@ Change_day_to_month
   ${return_value}=   Convert To String  ${month}${day}${rest}
   [Return]  ${return_value}
 
-
 Отримати інформацію про auctionPeriod.startDate
   Click Element  xpath=//a[@ui-sref="tenderView.auction"]
   Sleep    2
@@ -831,7 +1228,7 @@ Change_day_to_month
   \   ${count}=   Get Matching Xpath Count   xpath=//div[@class="ng-binding"]
   \   ${text}=   get text   xpath=//div[@class="ng-binding"]
   \   Exit For Loop If   '${count}' == '1' and '${text}' != ''
-  ${return_value}=   отримати текст із поля і показати на сторінці  auctionPeriod.startDate
+  ${return_value}=   Отримати текст із поля і показати на сторінці  auctionPeriod.startDate
   Log To Console     Auction date - ${return_value}
   ${return_value}=   get_time_with_offset   ${return_value}
   Log To Console     converted date - ${return_value}
@@ -874,9 +1271,6 @@ Change_day_to_month
   ...      ${ARGUMENTS[0]}  ==  username
   ...      ${ARGUMENTS[1]}  ==  auction_uaid
   ...      ${ARGUMENTS[2]}  ==  docs_number - 0
-  log to console  arg-0 - '${ARGUMENTS[0]}'
-  log to console  arg-1 - '${ARGUMENTS[1]}'
-  log to console  arg-2 - '${ARGUMENTS[2]}'
   Sleep     60
   # Docs count inside the bid awaiting for Accept
   Reload Page
@@ -927,9 +1321,6 @@ Change_day_to_month
   ...      ${ARGUMENTS[0]}  ==  user_name
   ...      ${ARGUMENTS[1]}  ==  file_path
   ...      ${ARGUMENTS[2]}  ==  auction_uaid
-  log to console  arg-0 - '${ARGUMENTS[0]}'
-  log to console  arg-1 - '${ARGUMENTS[1]}'
-  log to console  arg-2 - '${ARGUMENTS[2]}'
   Run Keyword If    'дискваліфікувати' in '${TEST_NAME}'   Rejection Protocol
   Run Keyword If    'дискваліфікувати' in '${TEST_NAME}'   Execute Javascript  $('button[ng-file-select=""]').click()
   Run Keyword If    'дискваліфікувати' in '${TEST_NAME}'   Choose File    xpath=//input[@type="file"]    ${ARGUMENTS[1]}
@@ -967,9 +1358,6 @@ Accept Protocol
   ...      ${ARGUMENTS[0]}  ==  user_name
   ...      ${ARGUMENTS[1]}  ==  file_path
   ...      ${ARGUMENTS[2]}  ==  auction_uaid
-  log to console  arg-0 - '${ARGUMENTS[0]}'
-  log to console  arg-1 - '${ARGUMENTS[1]}'
-  log to console  arg-2 - '${ARGUMENTS[2]}'
   # Total Rejection We take part of test from Upload decision KeyWord.
   Sleep     2
   # Confirm looser
@@ -986,10 +1374,6 @@ Accept Protocol
   ...      ${ARGUMENTS[1]}  ==  auction_uaid
   ...      ${ARGUMENTS[2]}  ==  some_number -1
   ...      ${ARGUMENTS[3]}  ==  file_path
-  log to console  arg-0 - '${ARGUMENTS[0]}'
-  log to console  arg-1 - '${ARGUMENTS[1]}'
-  log to console  arg-2 - '${ARGUMENTS[2]}'
-  log to console  arg-3 - '${ARGUMENTS[3]}'
   Sleep     2
   Click Element  xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
@@ -1013,11 +1397,7 @@ Accept Protocol
   ...      ${ARGUMENTS[1]}  ==  auction_uaid
   ...      ${ARGUMENTS[2]}  ==  file_path
   ...      ${ARGUMENTS[3]}  ==  docs_number
-#  Log To Console    arg_0 - '${ARGUMENTS[0]}'
-#  Log To Console    arg_1 - '${ARGUMENTS[1]}'
-#  Log To Console    arg_2 - '${ARGUMENTS[2]}'
-#  Log To Console    arg_3 - '${ARGUMENTS[3]}'
-  Run Keyword If    '${ARGUMENTS[0]}' != 'Newtend_Viewer'   Click Element    xpath=//div[@href="#/home/?pageNum=1&query=&status=&bidderOnly=&procurementMethodType="]
+  Run Keyword If    '${ARGUMENTS[0]}' != 'Newtend_Viewer'   Click Element    xpath=//a[@href="/"]
   Run Keyword If    '${ARGUMENTS[0]}' == 'Newtend_Viewer'   Go To    http://ea-trunk.newtend.com/provider/
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
@@ -1099,7 +1479,7 @@ Accept Protocol
   Reload Page
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]       # Navigating to see cancellation reason
   Sleep     3
-  ${return_value}=   отримати текст із поля і показати на сторінці  cancellations[0].status
+  ${return_value}=   Отримати текст із поля і показати на сторінці  cancellations[0].status
   ${return_value}=   convert_Nt_String_To_Common_String     ${return_value}
   Log To Console     Auction date - ${return_value}
   [Return]      ${return_value}
@@ -1111,12 +1491,14 @@ Accept Protocol
   Log To Console    ${text}
   [Return]          ${text}
 
-
 Отримати інформацію із документа    # Document Title
-  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}  ${field}
-  Wait Until Page Contains Element  xpath=//a[@class="ng-binding"]
+  [Arguments]  @{ARGUMENTS}
+  # ${username}  ${tender_uaid}  ${doc_id}  ${field}
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Click Element     xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep     3
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Wait Until Page Contains Element   xpath=//a[@class="ng-binding"]
   Sleep     2
-  ${title}=   Get Text   xpath=//a[contains(text(), '${doc_id}')]
+  ${title}=   Get Text   xpath=//a[contains(text(), '${ARGUMENTS[2]}')]
   Log To Console    ${title}
   [Return]  ${title}
 

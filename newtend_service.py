@@ -90,4 +90,9 @@ def convert_nt_string_to_common_string(string):
         u'Завершено': u'complete',
         u'До участі допускаються лише ліцензовані фінансові установи.': u'Only licensed financial institutions are eligible to participate.',
         u'К участию допускаются только лицензированные финансовые учреждения.': u'Only licensed financial institutions are eligible to participate.',
+        u'Law requirements': u'dgfFinancialAssets',
+        u'Права вимоги за кредитами': u'dgfFinancialAssets',
+        u'Майно банків': u'dgfOtherAssets',
+        u'Assets of banks': u'dgfOtherAssets',
+        u'Юридична Інформація Майданчиків': u'x_dgfPlatformLegalDetails',
     }.get(string, string)

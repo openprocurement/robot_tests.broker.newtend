@@ -7,6 +7,11 @@ from calendar import monthrange
 import urllib
 
 
+
+def substract(dividend, divisor):
+    return int(dividend) - int(divisor)
+
+
 def download_file(url, file_name, output_dir):
     urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
 

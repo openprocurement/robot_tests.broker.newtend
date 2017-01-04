@@ -156,7 +156,7 @@ Login
 
 #  Items block info
 # === Loop Try to select items info ===
-  ${item_number}=   evaluate              ${NUMBER_OF_ITEMS} - 1
+  ${item_number}=   substract             ${NUMBER_OF_ITEMS}    1
   ${item_number}=   Convert To Integer    ${item_number}
   log to console    number of items - 1 = '${item_number}'
   : FOR   ${INDEX}  IN RANGE    0    ${NUMBER_OF_ITEMS}
@@ -1091,7 +1091,10 @@ Login
   [Arguments]  @{ARGUMENTS}
   [Documentation]
   ...      ${ARGUMENTS[0]} == username
-  ${value_raw}=     Get Text   xpath=//h3[@title=""]
+  Sleep     2
+  Reload Page
+  Sleep     5
+  ${value_raw}=     Get Text   xpath=//h3[@class="ng-binding"]
   Log To Console    ${value_raw}
   ${value_num}=     Get Substring  ${value_raw}  0   -4
   Log To Console    ${value_num}
@@ -1459,13 +1462,15 @@ Accept Protocol
   Click Element     xpath=//button[@id="cancel-tender-btn"]
   sleep     2
   Wait Until Page Contains Element     xpath=//form[@name="cancelTenderForm"]
-  Input Text    xpath=//textarea[@name="comment"]   ${ARGUMENTS[2]}
+  Select From List By Value    xpath=//select[@id="cancel-reason"]   ${ARGUMENTS[2]}
   # Document attach
   # Mega Hack for documents Upload
   Execute Javascript  $('span[class="attach-title ng-binding"]').click()
   Sleep     3
   Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[3]}
   Sleep     3
+  Input Text        xpath=//textarea[@id="document-description"]    ${ARGUMENTS[4]}
+  Sleep     2
   Click Element     xpath=//div[@ng-click="delete()"]
   Sleep     15
   Reload Page
@@ -1498,9 +1503,9 @@ Accept Protocol
   Sleep     3
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Wait Until Page Contains Element   xpath=//a[@class="ng-binding"]
   Sleep     2
-  ${title}=   Get Text   xpath=//a[contains(text(), '${ARGUMENTS[2]}')]
-  Log To Console    ${title}
-  [Return]  ${title}
+  Run Keyword And Return If    '${ARGUMENTS[3]}' == 'title'    Get Text   xpath=//a[contains(text(), '${ARGUMENTS[2]}')]
+  Run Keyword And Return If    '${ARGUMENTS[3]}' == 'description'   Get Text   xpath=//div[contains(., '${ARGUMENTS[2]}')]//div[@class="description ng-binding"]
+  [Return]
 
 Отримати документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}

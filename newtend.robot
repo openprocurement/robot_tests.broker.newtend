@@ -597,6 +597,10 @@ Login
   ...      ${ARGUMENTS[2]} ==  item_id
   ...      ${ARGUMENTS[3]} ==  field_name
   Run Keyword And Return  Отримати інформацію із ${ARGUMENTS[3]}
+# :TODO use near by construction to refactore all keywords that use 'Get Information From "Some agrument"'
+#  Need to send Argument with 'Field name' and argument with 'Item ID'
+#  Run Keyword And Return  Отримати інформацію із ${ARGUMENTS[3]}   ${ARGUMENTS[2]}
+
 
 Переглянути текст із поля і показати на сторінці
   [Arguments]   ${field_name}
@@ -605,6 +609,7 @@ Login
   [Return]  ${return_value}
 
 Отримати інформацію із description
+# :TODO - fix it, add @{arguments}, change path to Get Text
 # Відображення опису номенклатур тендера
   ${description_raw}=   Get text    xpath=//div[@ng-bind="item.description"(contains(text(), '${ARGUMENTS[2]}'))]
   Log To Console    item's descritpion text - ${description_raw}
@@ -625,6 +630,7 @@ Login
 
 ##CAV
 Отримати інформацію із classification.scheme
+# :TODO - fix it, add @{arguments}, change path to Get Text
 # Відображення схеми класифікації номенклатур тендера - CAV
   ${classificationScheme_newtend}=   Переглянути текст із поля і показати на сторінці   items[0].classification.scheme.title
   ${classificationScheme}=           convert_nt_string_to_common_string      ${classificationScheme_newtend}
@@ -682,9 +688,32 @@ Login
   [Return]      ${classification_description}
 
 ##item
+# :TODO - Refactor code using @{arguments}
+# --- see line 593 - Get Data from 'some argument'
 Отримати інформацію із unit.name
-  ${unit_name}=   Переглянути текст із поля і показати на сторінці   items[0].unit.name
-  Run Keyword And Return If  '${unit_name}' == 'килограммы'   Convert To String   кілограм
+# :TODO - fix it, add @{arguments}, change path to Get Text
+  ${unit_name}=   Get Text      xpath=//div[contains(., '${item_id}')]//span[@class="unit ng-binding"]
+#  ${unit_name}=   Переглянути текст із поля і показати на сторінці   items[${ARGUMENTS[2]}].unit.name
+  Log To Console    unit name - ${unit_name}
+#  Run Keyword And Return If  '${unit_name}' == 'килограммы'   Convert To String   кілограм
+  [Return]  ${unit_name}
+
+Отримати інформацію про items[0].unit.name
+  ${units}=     Get Webelements     xpath=//span[@class="unit ng-binding"]
+  ${unit_name}=     Get Text    ${units[0]}
+  Log To Console    unit namesss - ${unit_name}
+  [Return]  ${unit_name}
+
+Отримати інформацію про items[1].unit.name
+  ${units}=     Get Webelements     xpath=//span[@class="unit ng-binding"]
+  ${unit_name}=     Get Text    ${units[1]}
+  Log To Console    unit namesss - ${unit_name}
+  [Return]  ${unit_name}
+
+Отримати інформацію про items[2].unit.name
+  ${units}=     Get Webelements     xpath=//span[@class="unit ng-binding"]
+  ${unit_name}=     Get Text    ${units[2]}
+  Log To Console    unit namesss - ${unit_name}
   [Return]  ${unit_name}
 
 Отримати інформацію про unit.code
@@ -859,6 +888,8 @@ Login
 
 Отримати інформацію про Questions.answer
   [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...       ${ARGUMENTS[0]} == item_id
   Log to console    arg-0 - ${ARGUMENTS[0]}
   Reload Page
   Sleep     2
@@ -869,39 +900,6 @@ Login
   Sleep     10
   ${title}=     Get Webelement     xpath=//div[@ng-repeat="question in questions"][contains(., '${ARGUMENTS[0]}')]//span[@class="answer-description ng-binding"]
   ${resp}=   Get Text   ${title}
-  [Return]  ${resp}
-
-Отримати інформацію про questions[0].answer
-  Reload Page
-  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
-  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
-  Sleep     2
-  Reload Page
-  Sleep     2
-  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
-  ${resp}=   Get Text   ${title[1]}
-  [Return]  ${resp}
-
-Отримати інформацію про questions[1].answer
-  Reload Page
-  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
-  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
-  Sleep     2
-  Reload Page
-  Sleep     2
-  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
-  ${resp}=   Get Text   ${title[2]}
-  [Return]  ${resp}
-
-Отримати інформацію про questions[2].answer
-  Reload Page
-  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
-  Click Element              xpath=//a[@ui-sref="tenderView.chat"]
-  Sleep     2
-  Reload Page
-  Sleep     2
-  ${title}=     Get Webelements     xpath=//span[@class="answer-description ng-binding"]
-  ${resp}=   Get Text   ${title[3]}
   [Return]  ${resp}
 
 Отримати інформацію про Questions.title
@@ -1005,7 +1003,7 @@ Login
    ...      ${ARGUMENTS[1]} == ${tender_uaid}
    ...      ${ARGUMENTS[2]} == ${item_index} # smth strange
    ...      ${ARGUMENTS[3]} == ${answer_id}
-   Sleep    40          # :TODO check for correct syc and question show
+   Sleep    40
    Reload Page
    ${answer}=     Get From Dictionary   ${ARGUMENTS[2].data}  answer
    Click Element        xpath=//a[@ui-sref="tenderView.chat"]
@@ -1163,7 +1161,7 @@ Login
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   ${replaces}=      Get Webelements     xpath=//a[@ng-model="$parent.$parent.replaceFiles"]
-  Execute Javasript     ${replaces[1]}.click()
+  Execute Javascript     ${replaces[1]}.click()
   Sleep     2
   Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Log To Console    Document changed
@@ -1498,6 +1496,11 @@ Accept Protocol
 
 Отримати інформацію із документа    # Document Title
   [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...       ${ARGUMENTS[0]} == username
+  ...       ${ARGUMENTS[1]} == auction_uaid
+  ...       ${ARGUMENTS[2]} == doc_id
+  ...       ${ARGUMENTS[3]} == field
   # ${username}  ${tender_uaid}  ${doc_id}  ${field}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Sleep     3

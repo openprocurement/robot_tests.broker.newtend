@@ -7,7 +7,6 @@ from calendar import monthrange
 import urllib
 
 
-
 def substract(dividend, divisor):
     return int(dividend) - int(divisor)
 
@@ -87,9 +86,11 @@ def convert_nt_string_to_common_string(string):
         u'active.awarded': u'active.qualification',
         u"Код відповідного класифікатору лоту": u"CAV",
         u"Житлова нерухомість": u"Житлова  нерухомість",
-        u'Trade canceled': u'active',
-        u'Торг скасовано': u'active',
-        u'Торг отменен': u'active',
+        u'Auction cancelled': u'cancelled',
+        u'Торги відмінено': u'cancelled',
+        u'Торги отменены': u'cancelled',
+        u'Lot cancelled': u'active',
+        u'Лот скасовано': u'active',
         u'Completed': u'complete',
         u'Завершен': u'complete',
         u'Завершено': u'complete',

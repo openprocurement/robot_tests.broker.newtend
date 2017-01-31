@@ -1065,8 +1065,8 @@ Login
   Wait Until Page Contains Element      xpath=//div[@class="bid-placed make-bid ng-scope"]
   Sleep     2
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Reload Page
-  Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element    xpath=//div[@class="alert alert-warning ng-binding"]
-  ${alert}=     Run Keyword If      'Неможливість' in '${TEST NAME}'    Get Matching Xpath Count    xpath=//div[@class="alert alert-warning ng-binding"]
+  Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element    xpath=//div[@class="alert alert-warning ng-binding ng-scope"]
+  ${alert}=     Run Keyword If      'Неможливість' in '${TEST NAME}'    Get Matching Xpath Count    xpath=//div[@class="alert alert-warning ng-binding ng-scope"]
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
   Sleep     2
   Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element   xpath=//button[@ng-click="cancelBid()"]
@@ -1484,7 +1484,7 @@ Accept Protocol
   Sleep     3
   ${return_value}=   Отримати текст із поля і показати на сторінці  cancellations[0].status
   ${return_value}=   convert_Nt_String_To_Common_String     ${return_value}
-  Log To Console     Auction date - ${return_value}
+  Log To Console     Auction data - ${return_value}
   [Return]      ${return_value}
 
 

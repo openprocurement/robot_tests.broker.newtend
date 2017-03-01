@@ -1,4 +1,19 @@
 # -*- coding: utf-8 -*-
+'''
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
+
+'''
+
 from datetime import datetime
 from pytz import timezone
 from iso8601 import parse_date
@@ -101,4 +116,32 @@ def convert_nt_string_to_common_string(string):
         u'Майно банків': u'dgfOtherAssets',
         u'Assets of banks': u'dgfOtherAssets',
         u'Юридична Інформація Майданчиків': u'x_dgfPlatformLegalDetails',
+        u'Очікує на рішення': u'pending.verification',
+        u'Ожидает решения': u'pending.verification',
+        u'Expecting decision': u'pending.verification',
+        u'Очікує розгляду': u'pending.waiting',
+        u'Ожидает рассмотрения': u'pending.waiting',
+        u'Expecting consideration': u'pending.waiting',
+        u'Очікується оплата': u'pending.payment',
+        u'Ожидается оплата': u'pending.payment',
+        u'': u'pending.payment',
+        u'Очікує кінця кваліфікації першого учасника': u'',
+        u'Ожидает квалификации конца первого участника': u'',
+        u'Очікується завантаження та підтвердження протоколу': u'',
+        u'Ожидается загрузка и подтверждение протокола': u'',
     }.get(string, string)
+
+
+'''
+payment agree btn      xpath=//button[@ng-click="decide('active')"]
+payment confirm modal  xpath=//div[@class="bids-modal ng-scope"]
+payment confirm btn    xpath=//button[@ng-click="accept()"]
+file upload control    xpath=//div[@ng-file-select=""]
+
+
+upload file btn        xpath=//button[@ng-model="files"]
+refuse participant btn  xpath=//button[@ng-click="decide('unsuccessful')"]
+
+participant awaiting for selection  xpath=//div[@class="col-xs-4 status ng-binding pending"]
+participant that is refused         xpath=//div[@class="col-xs-4 status ng-binding canceled"]
+'''

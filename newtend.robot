@@ -1520,3 +1520,21 @@ Accept Protocol
   [Return]  ${file_name}
 
 # ========== Auction Cancellation ============
+# === New Awarding process words ===
+# === Tender owner ===
+Завантажити протокол аукціону в авард
+  [Arguments]   @{ARGUMENTS}
+  [Documentation]
+  ...       ${ARGUMENTS[0]} == auction_uaid
+  ...       ${ARGUMENTS[1]} == auction_protocol_path
+  ...       ${ARGUMENTS[2]} == award_index
+  # Navigate to trades tab
+  log to console  arg0 - '${ARGUMENTS[0]}'
+  log to console  arg1 - '${ARGUMENTS[1]}'
+  log to console  arg2 - '${ARGUMENTS[2]}'
+  Click Element     xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep     2
+
+
+Підтвердити наявність протоколу аукціону
+

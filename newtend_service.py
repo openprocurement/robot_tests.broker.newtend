@@ -1,17 +1,72 @@
 # -*- coding: utf-8 -*-
 '''
+=== 1 ===
 bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
 bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
 
-bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
-bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
-bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+# ok - bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+# ok - bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+# ok - bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
 
 bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
 bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
 bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_active_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
 
+==== 2 ===
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:provider1
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_payment_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+
+=== 3 ===
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s contract_signing -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s contract_signing -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:provider1
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s contract_signing -A robot_tests_arguments/dgf_financial_second_award_complete.txt -v BROKER:Newtend -v ROLE:viewer
+
+=== 4 ===
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:provider1
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_verification_cancellation.txt -v BROKER:Newtend -v ROLE:viewer
+
+=== 5 ===
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:tender_owner
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:provider1
+
+bin/op_tests -s openProcedure -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s auction -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
+bin/op_tests -s awarding -A robot_tests_arguments/dgf_financial_verification_disqualification.txt -v BROKER:Newtend -v ROLE:viewer
 '''
 
 from datetime import datetime
@@ -122,13 +177,19 @@ def convert_nt_string_to_common_string(string):
         u'Очікує розгляду': u'pending.waiting',
         u'Ожидает рассмотрения': u'pending.waiting',
         u'Expecting consideration': u'pending.waiting',
-        u'Очікується оплата': u'pending.payment',
-        u'Ожидается оплата': u'pending.payment',
-        u'': u'pending.payment',
-        u'Очікує кінця кваліфікації першого учасника': u'',
-        u'Ожидает квалификации конца первого участника': u'',
-        u'Очікується завантаження та підтвердження протоколу': u'',
-        u'Ожидается загрузка и подтверждение протокола': u'',
+        u'Очікується оплата': u'active',
+        u'Ожидается оплата': u'pactive',
+        u'Pending payment': u'active',
+        u'Очікує кінця кваліфікації першого учасника': u'pending.waiting',
+        u'Ожидает квалификации конца первого участника': u'pending.waiting',
+        u'Очікується завантаження та підтвердження протоколу': u'pending.verification',
+        u'Ожидается загрузка и подтверждение протокола': u'pending.verification',
+        u'Відхилений': u'unsuccessful',
+        u'Отклонен': u'unsuccessful',
+        u'Refused': u'unsuccessful',
+        u'Очікується підписання контракту': u'active',
+        u'Ожидается подписание контракта': u'active',
+        u'Expected the signing of the contract': u'active',
     }.get(string, string)
 
 
@@ -138,10 +199,21 @@ payment confirm modal  xpath=//div[@class="bids-modal ng-scope"]
 payment confirm btn    xpath=//button[@ng-click="accept()"]
 file upload control    xpath=//div[@ng-file-select=""]
 
+accept offer    xpath=//button[@ng-click="finishVerification(bidAward, tender)"]
+accept modal    xpath=//div[@class="bids-modal ng-scope"]
+accept btn      xpath=//button[@ng-click="vm.setAwardVerified(vm.files[0], vm.award, vm.tender)"]
+
+expecting payment status      xpath=//div[@class="col-xs-4 status ng-binding pending"]
+
+winner selected status          xpath=//div[@class="col-xs-4 status ng-binding active"]
 
 upload file btn        xpath=//button[@ng-model="files"]
 refuse participant btn  xpath=//button[@ng-click="decide('unsuccessful')"]
 
-participant awaiting for selection  xpath=//div[@class="col-xs-4 status ng-binding pending"]
 participant that is refused         xpath=//div[@class="col-xs-4 status ng-binding canceled"]
+
+# new statuses
+first place waiting     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]
+second place waiting    xpath=//div[@class="col-xs-4 status ng-binding pending-waiting"]
+waiting for payment status    xpath=//div[@class="col-xs-4 status ng-binding pending-payment"]
 '''

@@ -420,6 +420,7 @@ Login
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Go To     http://ea-trunk.newtend.com/provider/
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
+  Wait Until Page Contains Element        xpath=//input[@type="search"]
   Input Text        xpath=//input[@type="search"]     ${auction_number}
   Click Element     xpath=//div[@ng-click="search()"]
   Sleep     2
@@ -1274,8 +1275,6 @@ Change_day_to_month
   Sleep     2
   Run Keyword If    '${TEST NAME}' == 'Можливість підтвердити оплату першого кандидата'   Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-payment"]
   Run Keyword If    '${TEST NAME}' == 'Можливість підтвердити оплату другого кандидата'   Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-payment"]
-#  Run Keyword If    '${TEST NAME}' != 'Можливість підтвердити оплату першого кандидата'   Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]  # old design
-#  Run Keyword If    '${TEST NAME}' != 'Можливість підтвердити оплату другого кандидата'   Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]  # old design
   Sleep     2
   Focus          xpath=//button[@ng-click="decide('active')"]
   Click Element  xpath=//button[@ng-click="decide('active')"]
@@ -1321,6 +1320,7 @@ Change_day_to_month
   [Return]  ${title}
 
 Скасування рішення кваліфікаційної комісії
+  # takes money and do not wait until qualify first
   [Arguments]  @{ARGUMENTS}
   [Documentation]
   ...      ${ARGUMENTS[0]}  ==  username
@@ -1330,17 +1330,20 @@ Change_day_to_month
   log to console  arg-1 - '${ARGUMENTS[1]}'
   log to console  arg-2 - '${ARGUMENTS[2]}'
 # Mooving inside accepted winner to make him PAIN!!!
+  Reload Page
+  Sleep     2
+  newtend.Пошук тендера по ідентифікатору     ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Sleep     2
   Click Element  xpath=//a[@ui-sref="tenderView.auction"]
   Reload Page
   Sleep     2
-  Click Element     xpath=//div[@class="col-xs-4 status ng-binding active"]
+  Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending-waiting"]
   Sleep     2
-  Wait Until Page Contains Element      xpath=//button[@ng-click="decide('unsuccessful')"]
-  Click Element     xpath=//button[@ng-click="decide('unsuccessful')"]
+  Wait Until Page Contains Element      xpath=//button[@ng-click="secondCancelAward(bidAward, tender)"]
+  Click Element     xpath=//button[@ng-click="secondCancelAward(bidAward, tender)"]
   Sleep     2
-  Wait Until Page Contains Element      xpath=//button[@ng-click="disapprove()"]
-  Click Element     xpath=//button[@ng-click="disapprove()"]
+  Wait Until Page Contains Element      xpath=//div[@ng-click="vm.cancel(vm.award, vm.tender)"]
+  Click Element     xpath=//div[@ng-click="vm.cancel(vm.award, vm.tender)"]
   Sleep     2
   Log To Console    'Winner - rejected'
 
@@ -1393,12 +1396,10 @@ Accept Protocol
   # Confirm looser
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
-#  ${active_participants}=    Get Webelements    xpath=//div[@class="col-xs-4 status ng-binding active"]
-#  Run Keyword If    '${active_participants}' > '0'    Click Element     xpath=//div[@class="col-xs-4 status ng-binding active"]
-  ${waiting_active}=    Get Webelements     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]
-  Run Keyword If     '${waiting_active}' > '0'       Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]  # Old design
+  Wait Until Page Contains Element      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
+  Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0
+  Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1
   Sleep     2
-#  Wait Until Page Contains Element   xpath=//button[@ng-click="disapprove()"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="decide('unsuccessful')"]     # new design
   Click Element     xpath=//button[@ng-click="decide('unsuccessful')"]      # new design
   Sleep     2
@@ -1568,9 +1569,6 @@ Accept Protocol
   ...       ${ARGUMENTS[1]} == auction_uaid
   ...       ${ARGUMENTS[2]} == auction_protocol_path
   # Navigate to trades tab
-  log to console  arg0 - '${ARGUMENTS[0]}'
-  log to console  arg1 - '${ARGUMENTS[1]}'
-  log to console  arg2 - '${ARGUMENTS[2]}'
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
   Wait Until Page Contains Element     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]
@@ -1584,7 +1582,7 @@ Accept Protocol
   Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
   Sleep     5
   Click Element     xpath=//button[@ng-click="vm.setAwardVerified(vm.files[0], vm.award, vm.tender)"]
-  Sleep     30
+  Sleep     15
 
 
 Підтвердити наявність протоколу аукціону
@@ -1592,6 +1590,6 @@ Accept Protocol
   [Documentation]
   ...       ${ARGUMENTS[0]} == auction_uaid
   ...       ${ARGUMENTS[1]} == index
-  Log To Console    arg0 - '${ARGUMENTS[0]}'
-  Log To Console    arg1 - '${ARGUMENTS[1]}'
-  Log To Console    'it's ok'
+  ${response}=      Run Keyword If   'Неможливість змінити статус' in '${TEST NAME}'     '${False}'
+  ${response}=      Run Keyword If   'Можливість підтвердити наявність протоколу аукціону' in '${TEST NAME}'   Log To Console   ok
+  [Return]     ${response}

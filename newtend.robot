@@ -424,9 +424,14 @@ Login
   Input Text        xpath=//input[@type="search"]     ${auction_number}
   Click Element     xpath=//div[@ng-click="search()"]
   Sleep     2
-  Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]   10
+  : FOR   ${INDEX}  IN RANGE    1   15
+  \   Log To Console   .   no_newline=true
+  \   Sleep     5
+  \   Reload Page
+  \   ${auctions}=   Get Matching Xpath Count   xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]
+  \   Exit For Loop If  '${auctions}' > '0'
   Sleep     2
-  Click Element                      xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]
+  Click Element     xpath=//a[@ui-sref="tenderView.overview({id: tender.id})"]
   Sleep     2
 
 # ====Newtend===========
@@ -1399,7 +1404,12 @@ Accept Protocol
   Wait Until Page Contains Element      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
   Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0
   Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1
+#  ${active_participants}=    Get Webelements    xpath=//div[@class="col-xs-4 status ng-binding active"]
+#  Run Keyword If    '${active_participants}' > '0'    Click Element     xpath=//div[@class="col-xs-4 status ng-binding active"]
+#  ${waiting_active}=    Get Webelements     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]
+#  Run Keyword If     '${waiting_active}' > '0'       Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]  # Old design
   Sleep     2
+#  Wait Until Page Contains Element   xpath=//button[@ng-click="disapprove()"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="decide('unsuccessful')"]     # new design
   Click Element     xpath=//button[@ng-click="decide('unsuccessful')"]      # new design
   Sleep     2
@@ -1569,6 +1579,9 @@ Accept Protocol
   ...       ${ARGUMENTS[1]} == auction_uaid
   ...       ${ARGUMENTS[2]} == auction_protocol_path
   # Navigate to trades tab
+  log to console  arg0 - '${ARGUMENTS[0]}'
+  log to console  arg1 - '${ARGUMENTS[1]}'
+  log to console  arg2 - '${ARGUMENTS[2]}'
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
   Wait Until Page Contains Element     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]
@@ -1590,6 +1603,9 @@ Accept Protocol
   [Documentation]
   ...       ${ARGUMENTS[0]} == auction_uaid
   ...       ${ARGUMENTS[1]} == index
+  Log To Console    arg0 - '${ARGUMENTS[0]}'
+  Log To Console    arg1 - '${ARGUMENTS[1]}'
   ${response}=      Run Keyword If   'Неможливість змінити статус' in '${TEST NAME}'     '${False}'
   ${response}=      Run Keyword If   'Можливість підтвердити наявність протоколу аукціону' in '${TEST NAME}'   Log To Console   ok
+  Log To Console    response - '${response}'
   [Return]     ${response}

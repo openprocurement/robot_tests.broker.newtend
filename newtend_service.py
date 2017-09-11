@@ -121,4 +121,7 @@ def convert_nt_string_to_common_string(string):
         u'Очікується підписання контракту': u'active',
         u'Ожидается подписание контракта': u'active',
         u'Expected the signing of the contract': u'active',
+        u'Голландський аукціон': u'dgfInsider',
+        u'Голландський аукцион': u'dgfInsider',
     }.get(string, string)
+

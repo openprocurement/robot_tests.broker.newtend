@@ -159,7 +159,7 @@ Login
   ${item_number}=   substract             ${NUMBER_OF_ITEMS}    1
   ${item_number}=   Convert To Integer    ${item_number}
   log to console    number of items - 1 = '${item_number}'
-  : FOR   ${INDEX}  IN RANGE    0    ${NUMBER_OF_ITEMS}
+  : FOR   ${INDEX}  IN RArNGE    0    ${NUMBER_OF_ITEMS}
   \   ${items}=         Get From Dictionary   ${ARGUMENTS[1].data}            items
   \   ${item[x]}=                              Get From List               ${items}                 ${INDEX}
   \   ${item_description}=                  Get From Dictionary         ${item[x]}     description
@@ -417,7 +417,7 @@ Login
   Switch browser   ${ARGUMENTS[0]}
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Wait Until Page Contains Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
-  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Go To     http://ea-trunk.newtend.com/provider/
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Go To     http://ea-trunk2.newtend.com/provider/
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}
   Wait Until Page Contains Element        xpath=//input[@type="search"]
@@ -1077,34 +1077,37 @@ Login
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == tender_uaid
   ...      ${ARGUMENTS[2]} == ${test_bid_data}
-  ${amount}=    Get From Dictionary     ${ARGUMENTS[2].data.value}    amount
+  ${count_amount}=    Get Count       ${ARGUMENTS[2].data}    value
+  ${count_amount}=    Convert To Integer    ${count_amount}
   Reload Page
   : FOR   ${INDEX}   IN RANGE    1    30
   \   Log To Console   .   no_newline=true
   \   sleep     3
   \   ${count}=   Get Matching Xpath Count   xpath=//button[@ng-click="placeBid()"]
   \   Exit For Loop If   '${count}' == '1'
-  Click Element     xpath=//button[@ng-click="placeBid()"]
-  ${amount_bid}=    Convert To Integer                 ${amount}
-  Clear Element Text  xpath=//input[@name="amount"]
-  Input Text          xpath=//input[@name="amount"]    ${amount_bid}
-  Click Element       xpath=//input[@name="agree"]          # Credential confirm
-  Run Keyword If      'Можливість' in '${TEST NAME}'    Click Element       xpath=//input[@name="bid-valid"]      # Validation of bid
-  Click Element       xpath=//button[@ng-click="placeBid()"]
+  Click Element    xpath=//button[@ng-click="placeBid()"]
+  Sleep     2
+  ${amount}=       Run Keyword If    ${count_amount} > 0   Get From Dictionary     ${ARGUMENTS[2].data.value}    amount
+  ${amount_bid}=   Run Keyword If    ${count_amount} > 0   Convert To Integer      ${amount}
+  Run Keyword If   ${count_amount} > 0    Clear Element Text   xpath=//input[@name="amount"]
+  Run Keyword If   ${count_amount} > 0    Input Text           xpath=//input[@name="amount"]    ${amount_bid}
+  Click Element    xpath=//input[@name="agree"]          # Credential confirm
+  Run Keyword If   'Можливість' in '${TEST NAME}'    Click Element       xpath=//input[@name="bid-valid"]      # Validation of bid
+  Click Element    xpath=//button[@ng-click="placeBid()"]
   Sleep     3
   Reload Page
   Wait Until Page Contains Element      xpath=//div[@class="bid-placed make-bid ng-scope"]
   Sleep     2
-  Run Keyword If      'Неможливість' in '${TEST NAME}'    Reload Page
-  Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element    xpath=//div[@class="alert alert-warning ng-binding ng-scope"]
+  Run Keyword If   'Неможливість' in '${TEST NAME}'    Reload Page
+  Run Keyword If   'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element    xpath=//div[@class="alert alert-warning ng-binding ng-scope"]
   ${alert}=     Run Keyword If      'Неможливість' in '${TEST NAME}'    Get Matching Xpath Count    xpath=//div[@class="alert alert-warning ng-binding ng-scope"]
-  Run Keyword If      'Неможливість' in '${TEST NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
+  Run Keyword If   'Неможливість' in '${TEST NAME}'    Click Element   xpath=//a[@ng-click="cancelBid()"]
   Sleep     2
-  Run Keyword If      'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element   xpath=//button[@ng-click="cancelBid()"]
-  Run Keyword If      'Неможливість' in '${TEST NAME}'    Click Element   xpath=//button[@ng-click="cancelBid()"]
-  ${resp}=      Run Keyword If   'Неможливість' in '${TEST NAME}'    Run Keyword If   '${alert}' == '1'    '${False}'
-  ${resp}=      Run Keyword If   'Можливість' in '${TEST NAME}'   Get text    xpath=//h3[@class="ng-binding"]
-  Log To Console    response - ${resp}
+  Run Keyword If   'Неможливість' in '${TEST NAME}'    Wait Until Page Contains Element   xpath=//button[@ng-click="cancelBid()"]
+  Run Keyword If   'Неможливість' in '${TEST NAME}'    Click Element   xpath=//button[@ng-click="cancelBid()"]
+  ${resp}=      Run Keyword If   'Неможливість' in '${TEST NAME}'  Run Keyword If   '${alert}' == '1'    '${False}'
+  ${resp}=      Run Keyword If   'Можливість' in '${TEST NAME}'    Get text    xpath=//h3[@class="ng-binding"]
+  Log To Console   response - ${resp}
   [Return]     ${resp}
 
 Скасувати цінову пропозицію
@@ -1139,8 +1142,8 @@ Login
     ...    ${ARGUMENTS[3]} ==  amount.value
     Reload Page
     Sleep   2
-    Click Element           xpath=//button[@ng-click="placeBid()"]
-    Clear Element Text      xpath=//input[@name="amount"]
+    Click Element        xpath=//button[@ng-click="placeBid()"]
+    Clear Element Text   xpath=//input[@name="amount"]
     ${updated_bid}=     Convert To Integer   ${ARGUMENTS[3]}
     Log To Console      Updatetd bid amount - ${updated_bid}
     Input Text          xpath=//input[@name="amount"]         ${updated_bid}
@@ -1156,7 +1159,7 @@ Login
   ...    ${ARGUMENTS[1]} ==  tenderId
   Click Element       xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
-  Click Element       xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
   Sleep     2
   Log To Console    'Specify document type - financialLicense'
   Select From List By Value    xpath=//select[@id="documentType"]      financialLicense
@@ -1173,9 +1176,9 @@ Login
   [Documentation]
   ...    ${ARGUMENTS[1]} ==  file
   ...    ${ARGUMENTS[2]} ==  tenderId
-  Click Element       xpath=//a[@ui-sref="tenderView.documents"]
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
-  Click Element       xpath=//button[@ng-click="uploadDocument()"]
+  Click Element     xpath=//button[@ng-click="uploadDocument()"]
   Sleep     2
   Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      commercialProposal
@@ -1189,7 +1192,7 @@ Login
   [Documentation]
   ...    ${ARGUMENTS[1]} ==  file
   ...    ${ARGUMENTS[2]} ==  tenderId
-  Click Element       xpath=//a[@ui-sref="tenderView.documents"]
+  Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   ${replaces}=      Get Webelements     xpath=//a[@ng-model="$parent.$parent.replaceFiles"]
   Execute Javascript     ${replaces[1]}.click()
@@ -1222,7 +1225,7 @@ Login
 Отримати посилання на аукціон для учасника
   [Arguments]  @{ARGUMENTS}
   Reload Page
-  Sleep     3
+  Sleep     5
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     3
   # Waiting for auction participant link

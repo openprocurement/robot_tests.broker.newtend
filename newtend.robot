@@ -159,7 +159,7 @@ Login
   ${item_number}=   substract             ${NUMBER_OF_ITEMS}    1
   ${item_number}=   Convert To Integer    ${item_number}
   log to console    number of items - 1 = '${item_number}'
-  : FOR   ${INDEX}  IN RArNGE    0    ${NUMBER_OF_ITEMS}
+  : FOR   ${INDEX}  IN RANGE    0    ${NUMBER_OF_ITEMS}
   \   ${items}=         Get From Dictionary   ${ARGUMENTS[1].data}            items
   \   ${item[x]}=                              Get From List               ${items}                 ${INDEX}
   \   ${item_description}=                  Get From Dictionary         ${item[x]}     description

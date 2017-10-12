@@ -115,6 +115,7 @@ def convert_nt_string_to_common_string(string):
         u'Ожидает квалификации конца первого участника': u'pending.waiting',
         u'Очікується завантаження та підтвердження протоколу': u'pending.verification',
         u'Ожидается загрузка и подтверждение протокола': u'pending.verification',
+        u'A protocol download and confirmation is awaited': u'pending.verification',
         u'Відхилений': u'unsuccessful',
         u'Отклонен': u'unsuccessful',
         u'Refused': u'unsuccessful',
@@ -122,6 +123,9 @@ def convert_nt_string_to_common_string(string):
         u'Ожидается подписание контракта': u'active',
         u'Expected the signing of the contract': u'active',
         u'Голландський аукціон': u'dgfInsider',
-        u'Голландський аукцион': u'dgfInsider',
+        u'Голландский аукцион': u'dgfInsider',
+        u'Dutch': u'dgfInsider',
+        u'CAV classificator': u'CAV',
+        u'VAT incl': True,
     }.get(string, string)
 

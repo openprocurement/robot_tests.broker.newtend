@@ -221,9 +221,6 @@ Login
   Input Text   xpath=//input[@ng-change="updateHours()"]     ${hours}
   Input Text   xpath=//input[@ng-change="updateMinutes()"]   ${minutes}
 
-#  Clear Element Text    xpath=//input[@name="tenderTurbo"]
-#  Input Text            xpath=//input[@name="tenderTurbo"]      360
-
 # Save Auction - publish to CDB
   Click Element                      ${locator.save}
   Wait Until Page Contains Element   xpath=//div[@id="attach-docs-modal"]   30
@@ -484,9 +481,10 @@ Login
 Отримати інформацію про awards[0].status
   Reload Page
   Sleep     2
+  Reload Page
+  Sleep     2
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
-#  Wait Until Page Contains Element      xpath=//div[@ng-repeat="bid in tenderBids"]     10
   ${status}=    Get Text    id=award-0
   ${correct_status}=    convert_nt_string_to_common_string      ${status}
   Log To Console    winner status - '${correct_status}'
@@ -495,9 +493,10 @@ Login
 Отримати інформацію про awards[1].status
   Reload Page
   Sleep     2
+  Reload Page
+  Sleep     2
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
-#  Wait Until Page Contains Element      xpath=//div[@ng-repeat="bid in tenderBids"]     10
   ${status}=    Get Text    id=award-1
   ${correct_status}=    convert_nt_string_to_common_string      ${status}
   Log To Console    looser status - '${correct_status}'
@@ -1077,6 +1076,7 @@ Login
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == tender_uaid
   ...      ${ARGUMENTS[2]} == ${test_bid_data}
+  Switch browser   ${ARGUMENTS[0]}
   ${count_amount}=    Get Count       ${ARGUMENTS[2].data}    value
   ${count_amount}=    Convert To Integer    ${count_amount}
   Reload Page
@@ -1224,6 +1224,7 @@ Login
 
 Отримати посилання на аукціон для учасника
   [Arguments]  @{ARGUMENTS}
+  Switch browser   ${ARGUMENTS[0]}
   Reload Page
   Sleep     5
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
@@ -1254,6 +1255,7 @@ Change_day_to_month
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.startDate
+  Sleep    2
   Click Element  xpath=//a[@ui-sref="tenderView.auction"]
   Sleep    2
   : FOR   ${INDEX}   IN RANGE    1    30
@@ -1405,14 +1407,9 @@ Accept Protocol
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
   Wait Until Page Contains Element      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
-  Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0
-  Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1
-#  ${active_participants}=    Get Webelements    xpath=//div[@class="col-xs-4 status ng-binding active"]
-#  Run Keyword If    '${active_participants}' > '0'    Click Element     xpath=//div[@class="col-xs-4 status ng-binding active"]
-#  ${waiting_active}=    Get Webelements     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]
-#  Run Keyword If     '${waiting_active}' > '0'       Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending-verification"]  # Old design
+  Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0      # may be that will work
+  Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1      # it was award-1
   Sleep     2
-#  Wait Until Page Contains Element   xpath=//button[@ng-click="disapprove()"]
   Wait Until Page Contains Element   xpath=//button[@ng-click="decide('unsuccessful')"]     # new design
   Click Element     xpath=//button[@ng-click="decide('unsuccessful')"]      # new design
   Sleep     2

@@ -87,13 +87,19 @@ ${locator.answer_raw}                       xpath=//div[@class="row question-con
   [Arguments]  @{ARGUMENTS}
   [Documentation]  Відкрити браузер, створити об’єкт api wrapper, тощо
   ...      ${ARGUMENTS[0]} ==  username
+
+  ${alias}=   Catenate   SEPARATOR=   role_    ${ARGUMENTS[0]}
+  Set Global Variable   ${BROWSER_ALIAS}   ${alias}
+
   Open Browser
   ...      ${USERS.users['${ARGUMENTS[0]}'].homepage}
   ...      ${USERS.users['${ARGUMENTS[0]}'].browser}
-  ...      alias=${ARGUMENTS[0]}
+  ...      alias=${BROWSER_ALIAS}
+#  ...      alias=${ARGUMENTS[0]}
   Set Window Size   @{USERS.users['${ARGUMENTS[0]}'].size}
   Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'   Login    ${ARGUMENTS[0]}
+  Log To Console    ''alias'' - '${BROWSER_ALIAS}'
 
 Login
   [Arguments]  @{ARGUMENTS}
@@ -411,7 +417,7 @@ Login
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   Log To Console   Who is it_0 - ${ARGUMENTS[0]}
   Log To Console   Searching for UFOs - ${ARGUMENTS[1]}
-  Switch browser   ${ARGUMENTS[0]}
+  Switch browser   ${BROWSER_ALIAS}
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Wait Until Page Contains Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Click Element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Owner'   Go To     http://ea-trunk2.newtend.com/provider/
@@ -1076,7 +1082,7 @@ Login
   ...      ${ARGUMENTS[0]} == username
   ...      ${ARGUMENTS[1]} == tender_uaid
   ...      ${ARGUMENTS[2]} == ${test_bid_data}
-  Switch browser   ${ARGUMENTS[0]}
+  Switch browser   ${BROWSER_ALIAS}
   ${count_amount}=    Get Count       ${ARGUMENTS[2].data}    value
   ${count_amount}=    Convert To Integer    ${count_amount}
   Reload Page
@@ -1224,7 +1230,7 @@ Login
 
 Отримати посилання на аукціон для учасника
   [Arguments]  @{ARGUMENTS}
-  Switch browser   ${ARGUMENTS[0]}
+  Switch browser   ${BROWSER_ALIAS}
   Reload Page
   Sleep     5
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
@@ -1495,7 +1501,7 @@ Accept Protocol
   ...      ${ARGUMENTS[4]} == 'description'
   # Looking for Auction
   Log To Console   Searching for canceled UFOs - ${ARGUMENTS[1]}
-  Switch browser   ${ARGUMENTS[0]}
+  Switch browser   ${BROWSER_ALIAS}
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   click element    xpath=//a[@href="#/home/?pageNum=1&query=&status=&userOnly=&procurementMethodType="]
   Sleep     2
   ${auction_number}=    Convert To String   ${ARGUMENTS[1]}

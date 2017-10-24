@@ -1278,7 +1278,21 @@ Change_day_to_month
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.endDate
-  Fail  На майданчику newtend не відображається поле Дата завершення аукціону
+  Sleep    2
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep    2
+  : FOR   ${INDEX}   IN RANGE    1    30
+  \   reload page
+  \   Log To Console   .   no_newline=true
+  \   sleep     30
+  \   ${count}=   Get Matching Xpath Count   xpath=//div[@id="auctionEndDate"]
+  \   ${text}=   get text   xpath=//div[@id="auctionEndDate"]
+  \   Exit For Loop If   '${count}' == '1' and '${text}' != ''
+  ${return_value}=   Get Text   xpath=//div[@id="auctionEndDate"]
+  Log To Console     Auction date - ${return_value}
+  ${return_value}=   get_time_with_offset   ${return_value}
+  Log To Console     converted end date - ${return_value}
+  [Return]  ${return_value}
 
 # =====================
 #    Qualification

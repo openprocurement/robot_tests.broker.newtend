@@ -1278,9 +1278,11 @@ Change_day_to_month
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.endDate
-  Sleep    2
+  Sleep    20
+  Switch browser   ${BROWSER_ALIAS}
+  Sleep    3
   Click Element  xpath=//a[@ui-sref="tenderView.auction"]
-  Sleep    2
+  Sleep    3
   : FOR   ${INDEX}   IN RANGE    1    30
   \   reload page
   \   Log To Console   .   no_newline=true

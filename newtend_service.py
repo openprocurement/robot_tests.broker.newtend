@@ -73,7 +73,9 @@ def convert_nt_string_to_common_string(string):
         u"Картонки": u"Картонні коробки",
         u"Уточнение": u"active.enquiries",
         u"Предложения": u"active.tendering",
+        u"Пропозиції": u"active.tendering",
         u"Аукцион": u"active.auction",
+        u"Аукціон": u"active.auction",
         u"Auction": u"active.auction",
         u'Кваліфікація': u'active.qualification',
         u'Qualification': u'active.qualification',
@@ -123,9 +125,11 @@ def convert_nt_string_to_common_string(string):
         u'Ожидается подписание контракта': u'active',
         u'Expected the signing of the contract': u'active',
         u'Голландський аукціон': u'dgfInsider',
+        u'Голандський аукціон': u'dgfInsider',
         u'Голландский аукцион': u'dgfInsider',
         u'Dutch': u'dgfInsider',
         u'CAV classificator': u'CAV',
         u'VAT incl': True,
+        u'з ПДВ': True,
     }.get(string, string)
 

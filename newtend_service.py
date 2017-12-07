@@ -28,16 +28,17 @@ def newtend_date_picker_index(isodate):
 
 
 def update_data_for_newtend(tender_data):
-    tender_data.data.procuringEntity['name'] = u"Bank fool name"
+    tender_data.data.procuringEntity['name'] = u"Organizer trader"
     return tender_data
 
 
 def update_data_for_newtend_new(role_name, tender_data):
     if role_name == 'tender_owner':
-        tender_data['data']['procuringEntity']['name'] = u"Bank fool name"
+        tender_data['data']['procuringEntity']['name'] = u"Organizer trader"
     return tender_data
 
 
+# This works in code
 def get_time_with_offset(date):
     date_obj = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     time_zone = timezone('Europe/Kiev')
@@ -60,6 +61,17 @@ def add_timezone_to_date(date_str):
 def convert_newtend_date_to_iso_format(date_time_from_ui):
     new_timedata = datetime.strptime(date_time_from_ui, '%Y-%m-%d %H:%M:%S')
     return new_timedata.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def to_iso_date(date_from_ui):
+    date_obj = datetime.strptime(date_from_ui, "%Y-%m-%d %H:%M:%S")
+    time_zone = timezone('Europe/Kiev')
+    localized_date = time_zone.localize(date_obj)
+    just_time = localized_date.strftime('%Y-%m-%dT%H:%M:%S')
+    time_zone = localized_date.strftime('%z')
+    if len(time_zone) > 4:
+        time_zone = time_zone[0:3] + ':' + time_zone[3:]
+    return just_time + time_zone
 
 
 def convert_nt_string_to_common_string(string):
@@ -87,7 +99,6 @@ def convert_nt_string_to_common_string(string):
         u'Failed': u'unsuccessful',
         u'Considered': u'',
         u'active.awarded': u'active.qualification',
-        u"Код відповідного класифікатору лоту": u"CAV",
         u"Житлова нерухомість": u"Житлова  нерухомість",
         u'Auction cancelled': u'cancelled',
         u'Торги відмінено': u'cancelled',
@@ -101,6 +112,7 @@ def convert_nt_string_to_common_string(string):
         u'К участию допускаются только лицензированные финансовые учреждения.': u'Only licensed financial institutions are eligible to participate.',
         u'Law requirements': u'dgfFinancialAssets',
         u'Права вимоги за кредитами': u'dgfFinancialAssets',
+        u'Аукціон з оренди': u'dgfOtherAssets',     # new vision of life
         u'Майно банків': u'dgfOtherAssets',
         u'Assets of banks': u'dgfOtherAssets',
         u'Юридична Інформація Майданчиків': u'x_dgfPlatformLegalDetails',
@@ -113,6 +125,7 @@ def convert_nt_string_to_common_string(string):
         u'Очікується оплата': u'pending.payment',
         u'Ожидается оплата': u'pending.payment',
         u'Pending payment': u'pending.payment',
+        u'Expecting payment': u'pending.payment',
         u'Очікує кінця кваліфікації першого учасника': u'pending.waiting',
         u'Ожидает квалификации конца первого участника': u'pending.waiting',
         u'Очікується завантаження та підтвердження протоколу': u'pending.verification',
@@ -128,8 +141,15 @@ def convert_nt_string_to_common_string(string):
         u'Голандський аукціон': u'dgfInsider',
         u'Голландский аукцион': u'dgfInsider',
         u'Dutch': u'dgfInsider',
-        u'CAV classificator': u'CAV',
+        u'CAV classificator': u'CPV',    #  u'CAV-PS',   # CAV was previously
+        u"Код відповідного класифікатору лоту": u"CPV",  # CAV was
+        u"Код соответствующего классификатора лота": u"CPV",  # CAV was
+        u"Додатковий класифікатор": u"PA01-7",  # PA01-7 was
+        u"Lot cancelled": u"active",
+        u"Лот отменен": u"active",
+        u"Лот скасовано": u"active",
         u'VAT incl': True,
         u'з ПДВ': True,
+        u'Used tractors': 'Трактори, що були у використанні',
     }.get(string, string)
 

@@ -146,10 +146,6 @@ Login
 # Date of auction start
   ${start_date}=    Get From Dictionary   ${ARGUMENTS[1].data.auctionPeriod}    startDate
 
-# Changing the Language to Uk
-#  Click Element     xpath=//a[@ng-click="vm.setLanguage('uk')"]
-#  Sleep     2
-
   Wait Until Page Contains Element   xpath=//a[@ui-sref="createTender"]   100
   Click Link                         xpath=//a[@ui-sref="createTender"]
 # Selecting DGF Financial asset or DGF Other assets
@@ -169,7 +165,6 @@ Login
   Input Text   ${locator.dgfid}              ${dgfID}
 # New fields add
   ${tender_attempts}=   Convert To String   ${tenderAttempts}
-  Log To Console    attempts - '${tender_attempts}'
   Select From List By Value   xpath=//select[@id="tenderAttempts"]    ${tender_attempts}
 
 # Selecting number of Bidders to qualify
@@ -257,16 +252,8 @@ Login
 # Contracting dates input
   \  ${contract_start_date_field}=   Get Webelements     xpath=//input[@id="start-date-contract"]
   \  Input Text     ${contract_start_date_field[-1]}     ${contract_start_date_date}
-#  \  ${start_date_hour_field}=       Get Webelements     xpath=//table[@ng-model="item.contractPeriod.startDate"]//input[@ng-model="hours"]
-#  \  Input Text     ${start_date_hour_field[-1]}         ${contract_start_hours}
-#  \  ${start_date_min_field}=        Get Webelements     xpath=//table[@ng-model="item.contractPeriod.startDate"]//input[@ng-model="minutes"]
-#  \  Input Text     ${start_date_min_field[-1]}     ${contract_start_minutes}
   \  ${contract_end_date_field}=     Get Webelements     xpath=//input[@id="end-date-contract"]
   \  Input Text     ${contract_end_date_field[-1]}       ${contract_end_date_date}
-#  \  ${end_date_hour_field}=     Get Webelements     xpath=//table[@ng-model="item.contractPeriod.endDate"]//input[@ng-model="hours"]
-#  \  Input Text     ${end_date_hour_field[-1]}           ${contract_end_hours}
-#  \  ${end_date_min_field}=      Get Webelements     xpath=//table[@ng-model="item.contractPeriod.endDate"]//input[@ng-model="minutes"]
-#  \  Input Text     ${end_date_min_field[-1]}           ${contract_end_minutes}
   \  ${new_item_cross}=    Get Webelements     xpath=//a[@ng-click="addField()"]
   \  Run Keyword If   '${INDEX}' < '${item_number}'   Click Element    ${new_item_cross[-1]}
 
@@ -307,12 +294,9 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism
-  Log To Console    'Interacting with documents modal window'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
-  Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      tenderNotice
   Sleep     2
-  Log To Console    'Inserting document'
   # === Mega Hack for document Upload ===
   Execute Javascript  $('button[ng-model="file"]').click()
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[1]}
@@ -327,7 +311,6 @@ Login
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${image_path}
-  Log To Console    arg-2 - ${ARGUMENTS[2]}
   # Navigating to documents tab
   Reload Page
   Sleep     2
@@ -336,12 +319,9 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism - Illustration
-  Log To Console    'Interacting with documents modal window - Illustation'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
-  Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      illustration
   Sleep     2
-  Log To Console    'Inserting document'
   # === Mega Hack for document Upload ===
   Execute Javascript  $('button[ng-model="file"]').click()
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
@@ -364,12 +344,9 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism - Illustration
-  Log To Console    'Interacting with documents modal window - VDR'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
-  Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      virtualDataRoom
   Sleep     2
-  Log To Console    'Inserting VDR'
   Input Text    xpath=//input[@id="auction-documnet-title"]    ${ARGUMENTS[2]}
   Input Text    xpath=//input[@id="document-url"]  ${ARGUMENTS[2]}
   # === Mega Hack for document Upload ===
@@ -392,13 +369,9 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism - Illustration
-  Log To Console    'Interacting with documents modal window - Public Passport'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
-  Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      x_dgfPublicAssetCertificate
-#  Select From List By Value    xpath=//select[@id="documentType"]      technicalSpecifications
   Sleep     2
-  Log To Console    'Inserting document'
   Input Text    xpath=//input[@id="auction-documnet-title"]     ${ARGUMENTS[2]}
   Sleep     2
   Input Text    xpath=//input[@id="document-url"]     ${ARGUMENTS[2]}
@@ -420,12 +393,9 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism - Illustration
-  Log To Console    'Interacting with documents modal window - Illustation'
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
-  Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      x_dgfAssetFamiliarization
   Sleep     2
-  Log To Console    'Inserting document'
   # === Mega Hack for document Upload ===
   Input Text    xpath=//input[@id="auction-documnet-title"]    ${ARGUMENTS[2]}
   Input Text    xpath=//textarea[@id="auction-documnet-accessDetails"]    ${ARGUMENTS[2]}
@@ -449,12 +419,9 @@ Login
   Wait Until Page Contains Element     xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   # Interacting with document upload mechanism - Illustration
-  Log To Console    'Interacting with documents modal window - '${ARGUMENTS[3]}''
   Wait Until Page Contains Element     xpath=//form[@name="uploadDocumentsForm"]
-  Log To Console    'Specify document type'
   Select From List By Value    xpath=//select[@id="documentType"]      ${ARGUMENTS[3]}
   Sleep     2
-  Log To Console    'Inserting document'
   # === Mega Hack for document Upload ===
   Execute Javascript  $('button[ng-model="file"]').click()
   Choose File         xpath=//input[@type="file"]    ${ARGUMENTS[2]}
@@ -469,7 +436,6 @@ Login
   [Documentation]
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  Log To Console   Who is it_0 - ${ARGUMENTS[0]}
   Log To Console   Searching for UFOs - ${ARGUMENTS[1]}
   Switch browser   ${BROWSER_ALIAS}
   Run Keyword If   '${ARGUMENTS[0]}' == 'Newtend_Owner'   Wait Until Page Contains Element    ${locator.e_logo}
@@ -499,9 +465,6 @@ Login
   ...       ${ARGUMENTS[1]} == AuctionID
   ...       ${ARGUMENTS[2]} == field_name, like value.amount, minimalStep.amount
   ...       ${ARGUMENTS[3]} == amount as float
-  Log to console    arg0 - ${ARGUMENTS[0]}
-  Log to console    arg1 - ${ARGUMENTS[1]}
-  Log to console    arg2 - ${ARGUMENTS[2]}
   : FOR   ${INDEX}  IN RANGE    1   15
   \   Log To Console   .   no_newline=true
   \   Sleep     3
@@ -531,7 +494,6 @@ Change Budget
   Sleep     2
   Input Text       id=budget   ${amount}
   Sleep     2
-  log To Console   'budget input - OK'
   Focus            id=update-btn
   Sleep     2
   Click Element    id=update-btn
@@ -549,7 +511,6 @@ Change Amount
   Sleep     3
   Input Text        id=step     ${amount}
   Sleep     3
-  Log To Console    Step - changed
   Focus             id=update-btn
   Sleep     3
   Click Element     id=update-btn
@@ -566,14 +527,11 @@ Change Guarantee
   Sleep     3
   Input Text       id=guarantee-amount     ${amount}
   Sleep     3
-  Log To Console    Guarantee - changed
   Focus             id=update-btn
   Sleep     3
   Click Element     id=update-btn
   Sleep     2
 
-
-# ====Newtend===========
 Отримати кількість предметів в тендері
   [Arguments]  @{ARGUMENTS}
   Reload Page
@@ -591,7 +549,6 @@ Change Guarantee
   ...     ${ARGUMENTS[0]} == username
   ...     ${ARGUMENTS[1]} == auction_uaid
   ...     ${ARGUMENTS[2]} == item_info
-  Log To Console    arg-0 - ${ARGUMENTS[0]}
 
 Видалити предмет закупівлі
   [Arguments]   @{ARGUMENTS}
@@ -599,8 +556,6 @@ Change Guarantee
   ...     ${ARGUMENTS[0]} == username
   ...     ${ARGUMENTS[1]} == auction_uaid
   ...     ${ARGUMENTS[2]} == item_id
-  Log To Console    arg-0 - ${ARGUMENTS[0]}
-
 
 Отримати інформацію із тендера
   [Arguments]  @{ARGUMENTS}
@@ -633,28 +588,23 @@ Change Guarantee
   Run Keyword If    "статусу \'unsuccessful\' для першого кандидата" in "${TEST NAME}"  Check unsuccessful.man
   Run Keyword If    "\'оплачено, очікується підписання договору\' для першого кандидата" in "${TEST NAME}"  Check sign.waiting
   Run Keyword If    "статусу \'cancelled\' для першого кандидата" in "${TEST NAME}"  Check pending.cancelled
-  # :TODO  add статусу 'unsuccessful' для першого кандидата ++
-  # :TODO  add статусу 'оплачено, очікується підписання договору' для першого кандидата ++
   Sleep     2
   Reload Page
   Sleep     2
   ${status}=    Get Text    id=award-0
   ${correct_status}=    convert_nt_string_to_common_string      ${status}
-  Log To Console    winner status - '${correct_status}'
   [Return]    ${correct_status}
 
 Check pending.verification
 # Invisible squirell
   Reload Page
   Sleep     2
-  Log To Console    SQIRELL in PROGRESS
   : FOR     ${INDEX}  IN RANGE   1   15
   \   Sleep     7
   \   Reload Page
   \   Sleep     3
   \   ${status}=    Get Text    id=award-0
   \   ${correct_status}=    convert_nt_string_to_common_string      ${status}
-  \   Log To Console    loop ${INDEX} status - ${correct_status}
   \   Exit For Loop If      '${correct_status}' == 'pending.verification'
   \   Sleep     2
 
@@ -662,7 +612,6 @@ Check pending.payment
   # Invisible squirell
   Reload Page
   Sleep     2
-  Log To Console    SQIRELL in PROGRESS
   : FOR     ${INDEX}  IN RANGE   1   15
   \   Sleep     7
   \   Reload Page
@@ -677,7 +626,6 @@ Check unsuccessful.man
   # Invisible squirell
   Reload Page
   Sleep     2
-  Log To Console    SQIRELL in PROGRESS
   : FOR     ${INDEX}  IN RANGE   1   15
   \   Sleep     7
   \   Reload Page
@@ -692,7 +640,6 @@ Check sign.waiting
   # Invisible squirell
   Reload Page
   Sleep     2
-  Log To Console    SQIRELL in PROGRESS
   : FOR     ${INDEX}  IN RANGE   1   15
   \   Sleep     7
   \   Reload Page
@@ -729,13 +676,11 @@ Check pending.cancelled
   Run Keyword If    "статусу \'cancelled\' для другого кандидата" in "${TEST NAME}"  Check pending.cancelled_1
   Run Keyword If    "статусу \'unsuccessful\' для другого кандидата" in "${TEST NAME}"  Check unsuccessful.man_1
   Run Keyword If    "\'оплачено, очікується підписання договору\' для другого кандидата" in "${TEST NAME}"  Check sign.waiting_1
-  # :TODO - Відображення статусу 'cancelled' для другого кандидата ++
   Sleep     2
   Reload Page
   Sleep     2
   ${status}=    Get Text    id=award-1
   ${correct_status}=    convert_nt_string_to_common_string      ${status}
-  Log To Console    looser status - '${correct_status}'
   [Return]    ${correct_status}
 
 Check pending.verification_1
@@ -784,7 +729,6 @@ Check unsuccessful.man_1
   # Invisible squirell
   Reload Page
   Sleep     2
-  Log To Console    SQIRELL in PROGRESS
   : FOR     ${INDEX}  IN RANGE   1   15
   \   Sleep     7
   \   Reload Page
@@ -799,7 +743,6 @@ Check sign.waiting_1
   # Invisible squirell
   Reload Page
   Sleep     2
-  Log To Console    SQIRELL in PROGRESS
   : FOR     ${INDEX}  IN RANGE   1   15
   \   Sleep     7
   \   Reload Page
@@ -814,7 +757,6 @@ Check sign.waiting_1
   Reload page
   ${return_value}=   Отримати текст із поля і показати на сторінці   status
   ${return_value}=   convert_nt_string_to_common_string     ${return_value}
-  Log To Console     ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про description
@@ -855,7 +797,6 @@ Check sign.waiting_1
   Sleep     4
   ${guarantee}=     Get Text    xpath=//div[@id="summ"]
   ${guarantee_amount}=  Convert To Number   ${guarantee.split(' ')[0]}
-  Log To Console    GUARANTEE - ${guarantee_amount}
   [Return]  ${guarantee_amount}
 
 Check changed guarantee.amount
@@ -870,7 +811,6 @@ Check changed guarantee.amount
   \   ${valueAmount_1}=   Convert To Number   ${valueAmount_1.split(' ')[0]}
   \   ${diff}=      substract       ${valueAmount}      ${valueAmount_1}
   \   Exit For Loop If    '${diff}' != '0'
-  \   log To Console    'difference' - '${diff}'
 
 Отримати інформацію про auctionId
   ${auctionId}=   Отримати текст із поля і показати на сторінці   auctionId
@@ -898,7 +838,6 @@ Check changed value.amount
   \   ${valueAmount_1}=   Convert To Number   ${valueAmount_1.split(' ')[0]}
   \   ${diff}=      substract       ${valueAmount}      ${valueAmount_1}
   \   Exit For Loop If    '${diff}' != '0'
-  \   log To Console    'difference' - '${diff}'
 
 Отримати інформацію про minimalStep.amount
   Sleep     4
@@ -922,7 +861,6 @@ Check changed step.amount
   \   ${valueAmount_1}=   Convert To Number   ${valueAmount_1.split(' ')[0]}
   \   ${diff}=      substract       ${valueAmount}      ${valueAmount_1}
   \   Exit For Loop If    '${diff}' != '0'
-  \   log To Console    'difference' - '${diff}'
 
 Отримати інформацію про value.currency
   ${valueCurrency}=       Отримати текст із поля і показати на сторінці    value.currency
@@ -938,14 +876,12 @@ Check changed step.amount
 # Name of auction creator
 Отримати інформацію про procuringEntity.name
   ${procuringEntity_name}=   Отримати текст із поля і показати на сторінці   procuringEntity.name
-  Log To Console  ${procuringEntity_name}
   [Return]  ${procuringEntity_name}
 
 Отримати інформацію про procurementMethodType
   ${type_titles}=   Get Webelements     xpath=//div[@class="title"]
   ${procurementType_text}=   Get Text   ${type_titles[-1]}
   ${procurementMethodType}=  convert_nt_string_to_common_string   ${procurementType_text}
-  Log To Console  ${procurementMethodType}
   [Return]  ${procurementMethodType}
 
 Отримати інформацію про enquiryPeriod.endDate
@@ -958,9 +894,7 @@ Check changed step.amount
 
 Отримати інформацію про tenderPeriod.endDate
   ${tenderPeriodEndDate}=   Отримати текст із поля і показати на сторінці   tenderPeriod.endDate
-  Log To Console     ${tenderPeriodEndDate}
   ${return_value}=   get_time_with_offset   ${tenderPeriodEndDate}
-  Log To Console     ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про enquiryPeriod.startDate
@@ -969,7 +903,6 @@ Check changed step.amount
 
 Отримати інформацію про eligibilityCriteria
   ${eligibilityCriteria}=   Отримати текст із поля і показати на сторінці   eligibilityCriteria
-  Log To Console            ${eligibilityCriteria}
   [Return]  ${eligibilityCriteria}
 
 # Comperison of Item names fields by Item's strange name
@@ -985,11 +918,9 @@ Check changed step.amount
 Отримати інформацію із contractPeriod.startDate
   # Item ID like - i-5ad0fc1e
   [Arguments]   ${field_name}
-  Log To Console   contract args -  ${field_name}
   ${contract_start_date}=   Get Webelement   xpath=//div[@ng-repeat="item in tender.items track by $index"][contains(., '${field_name}')]/..//div[@id="start-date-contract"]/.//span[@class="ng-binding"]
   ${raw_date}=   Get Text      ${contract_start_date}
   ${date}=       to_iso_date   ${raw_date}
-  Log To Console    Worked as Proper - CHANGED ST DATE - '${date}'
   [Return]  ${date}
 
 Отримати інформацію із contractPeriod.endDate
@@ -997,7 +928,6 @@ Check changed step.amount
   ${contract_end_date}=   Get Webelement   xpath=//div[@ng-repeat="item in tender.items track by $index"][contains(., '${field_name}')]/..//div[@id="end-date-contract"]//span[@class="ng-binding"]
   ${raw_date}=   Get Text      ${contract_end_date}
   ${date}=       to_iso_date   ${raw_date}
-  Log To Console   Worked as Proper - CHANGED END DATE - '${date}'
   [Return]  ${date}
 
 Переглянути текст із поля і показати на сторінці
@@ -1020,7 +950,6 @@ Check changed step.amount
   [Arguments]   ${field_name}
 # Відображення опису номенклатур тендера
   ${description_raw}=   Get text    xpath=//div[@ng-bind="item.description"][(contains(text(), '${field_name}'))]
-  Log To Console    item's descritpion text - ${description_raw}
   ${description_1}=    Get Substring     ${description_raw}  0   11
   ${description_2}=    convert_nt_string_to_common_string  ${description_raw.split(': ')[-1]}
   ${description}=      Catenate  ${description_1}  ${description_2}
@@ -1032,7 +961,6 @@ Check changed step.amount
 # Відображення схеми класифікації номенклатур тендера - CAV
   ${classificationScheme_newtend}=   Get Webelement   xpath=//div[@ng-repeat="item in tender.items track by $index"][contains(., '${field_name}')]//span[contains(@id, "classifier-scheme")]
   ${classificationScheme}=           Get Text   ${classificationScheme_newtend}
-  Log To Console    convertation - ${classificationScheme}
   [Return]  ${classificationScheme}
 
 Отримати інформацію із classification.id
@@ -1074,7 +1002,6 @@ Check changed step.amount
   [Arguments]   ${field_name}
   ${unit_field}=    Get Webelement  xpath=//div[@ng-repeat="item in tender.items track by $index"][contains(., '${field_name}')]//span[@class="unit ng-binding"]
   ${unit_name}=   Get Text      ${unit_field}
-  Log To Console    Worked as Proper - unit name - ${unit_name}
   [Return]  ${unit_name}
 
 Отримати інформацію із quantity
@@ -1083,15 +1010,6 @@ Check changed step.amount
   ${quantity}=   Get Text   ${quantity_field}
   ${quantity}=   Convert To Number   ${quantity}
   [Return]  ${quantity}
-
-#Отримати інформацію про unit.code
-#  Fail  Не реалізований функціонал
-#
-#Отримати інформацію про items[0].unit.code
-#  Fail  Не реалізований функціонал
-#
-#Отримати інформацію про items[1].unit.code
-#  Fail  Не реалізований функціонал
 
 Отримати інформацію із unit.code
   [Arguments]   ${field_name}
@@ -1188,7 +1106,6 @@ Check changed step.amount
   Select From List By Label  xpath=//select[@name="questionOf"]    Предмет аукціону
   Sleep     2
   ${item_name}=     Get text    xpath=//option[contains(text(), '${ARGUMENTS[2]}')]
-  Log To Console    '${item_name}'
   Select From List By Label  xpath=//select[@name="relatedItem"]   ${item_name}
   Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${description}
   Click Element   xpath=//button[@ng-click="sendQuestion()"]
@@ -1211,14 +1128,12 @@ Check changed step.amount
 
 Отримати кількість документів в тендері
   [Arguments]   @{ARGUMENTS}
-  Log To Console    arg-0 - ${ARGUMENTS[0]}
   Reload Page
   Sleep     2
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'     Wait Until Page Contains      xpath=//a[@ui-sref="tenderView.overview"]
   Click Element     xpath=//a[@ui-sref="tenderView.overview"]
   Sleep     2
   ${docs_amount}=   Get Matching Xpath Count    xpath=//div[@ng-repeat="document in documentsSection | versionFilter | orderBy:'-dateModified'"]
-  Log To Console    Docs amount - ${docs_amount}
   [Return]      ${docs_amount}
 
 # ==========================
@@ -1238,7 +1153,6 @@ Check changed step.amount
   [Arguments]   @{ARGUMENTS}
   [Documentation]
   ...       ${ARGUMENTS[0]} == item_id
-  Log to console    arg-0 - ${ARGUMENTS[0]}
   Reload Page
   Sleep     2
   Wait Until Page Contains Element   xpath=//a[@ui-sref="tenderView.chat"]   20
@@ -1325,7 +1239,6 @@ Check changed step.amount
 Отримати інформацію про Questions[1].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[1]}
-  Log To Console    ${resp}
   [Return]  ${resp}
 
 Отримати інформацію про Questions[2].title
@@ -1345,13 +1258,11 @@ Check changed step.amount
   Sleep     2
   ${title}=     Get Webelements     xpath=//span[@class="user ng-binding"]
   ${resp}=   Get Text   ${title[2]}
-  Log To Console    ${resp}
   [Return]  ${resp}
 
 Отримати інформацію про Questions[2].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[2]}
-  Log To Console    ${resp}
   [Return]  ${resp}
 
 Отримати інформацію про Questions[3].title
@@ -1363,13 +1274,11 @@ Check changed step.amount
   Sleep     2
   ${title}=     Get Webelements     xpath=//span[@class="user ng-binding"]
   ${resp}=   Get Text   ${title[3]}
-  Log To Console    ${resp}
   [Return]  ${resp}
 
 Отримати інформацію про Questions[3].description
   ${description}=   Get Webelements     xpath=//span[@class="question-description ng-binding"]
   ${resp}=   Get Text   ${description[3]}
-  Log To Console    ${resp}
   [Return]  ${resp}
 
 Відповісти на запитання
@@ -1386,7 +1295,6 @@ Check changed step.amount
    Sleep    3
    # Try to answer - try to find correct xpath for answering Round ((
    ${answer_row}=   Get Webelement   xpath=//div[@class="col-xs-10 col-sm-10"][contains(., '${ARGUMENTS[3]}')]
-   Log To Console   ${answer_row}
    Mouse Over       ${answer_row}    # should show answer btn
    Sleep    1
    ${answer_round}=     Get Webelement     xpath=//div[@class="answer mouseenter"]  # Interacting with answer btn
@@ -1407,8 +1315,6 @@ Check changed step.amount
   ${document_type}=     Get Text    ${documents[${ARGUMENTS[2]}]}
   ${description}=   convert to string    ${document_type.split(' / ')[-1]}
   Run Keyword And Return If   u'${description}' == u'Юридична Інформація Майданчиків'   convert_nt_string_to_common_string   ${description}
-  Log To Console    doc text = ${document_type}
-  Log To Console    doc type = ${description}
   [Return]      ${document_type}
 
 # =======================================
@@ -1453,7 +1359,6 @@ Check changed step.amount
   Run Keyword If   'Неможливість' in '${TEST NAME}'    Click Element   xpath=//button[@ng-click="cancelBid()"]
   ${resp}=      Run Keyword If   'Неможливість' in '${TEST NAME}'  Run Keyword If   '${alert}' == '1'    '${False}'
   ${resp}=      Run Keyword If   'Можливість' in '${TEST NAME}'    Get text    xpath=//h3[@class="ng-binding"]
-  Log To Console   response - ${resp}
   [Return]     ${resp}
 
 Скасувати цінову пропозицію
@@ -1473,9 +1378,7 @@ Check changed step.amount
   Reload Page
   Sleep     5
   ${value_raw}=     Get Text   xpath=//h3[@class="ng-binding"]
-  Log To Console    ${value_raw}
   ${value_num}=     Get Substring  ${value_raw}  0   -4
-  Log To Console    ${value_num}
   ${value}=         Convert To Integer  ${value_num}
   [Return]  ${value}
 
@@ -1491,7 +1394,6 @@ Check changed step.amount
     Click Element        xpath=//button[@ng-click="placeBid()"]
     Clear Element Text   xpath=//input[@name="amount"]
     ${updated_bid}=     Convert To Integer   ${ARGUMENTS[3]}
-    Log To Console      Updatetd bid amount - ${updated_bid}
     Input Text          xpath=//input[@name="amount"]         ${updated_bid}
     Sleep   3
     Click Element       xpath=//button[@ng-click="changeBid()"]
@@ -1507,7 +1409,6 @@ Check changed step.amount
   Wait Until Page Contains Element    xpath=//button[@ng-click="uploadDocument()"]
   Click Element     xpath=//button[@ng-click="uploadDocument()"]
   Sleep     2
-  Log To Console    'Specify document type - financialLicense'
   Select From List By Value    xpath=//select[@id="documentType"]      financialLicense
   Sleep     2
   Execute Javascript  $('button[ng-file-select=""]').click()
@@ -1544,7 +1445,6 @@ Check changed step.amount
   Execute Javascript     ${replaces[1]}.click()
   Sleep     2
   Choose File       xpath=//input[@type="file"]    ${ARGUMENTS[2]}
-  Log To Console    Document changed
 # ==================
 # === Links for auction ===
 Отримати посилання на аукціон для глядача
@@ -1564,7 +1464,6 @@ Check changed step.amount
   Wait Until Page Contains Element      xpath=//a[@class="auction-link ng-binding"]     10
   ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
   ${result}=    Convert To String  ${result}
-  Log To Console    ${result}
   [Return]  ${result}
 
 
@@ -1586,7 +1485,6 @@ Check changed step.amount
   Wait Until Page Contains Element      xpath=//a[@class="auction-link ng-binding"]     10
   ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
   ${result}=    Convert To String       ${result}
-  Log To Console    ${result}
   [Return]  ${result}
 # =========================
 
@@ -1612,9 +1510,7 @@ Change_day_to_month
   \   ${text}=   get text   xpath=//div[@class="ng-binding"]
   \   Exit For Loop If   '${count}' == '1' and '${text}' != ''
   ${return_value}=   Отримати текст із поля і показати на сторінці  auctionPeriod.startDate
-  Log To Console     Auction date - ${return_value}
   ${return_value}=   get_time_with_offset   ${return_value}
-  Log To Console     converted date - ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.endDate
@@ -1631,9 +1527,7 @@ Change_day_to_month
   \   ${text}=   get text   xpath=//div[@id="auctionEndDate"]
   \   Exit For Loop If   '${count}' == '1' and '${text}' != ''
   ${return_value}=   Get Text   xpath=//div[@id="auctionEndDate"]
-  Log To Console     Auction date - ${return_value}
   ${return_value}=   get_time_with_offset   ${return_value}
-  Log To Console     converted end date - ${return_value}
   [Return]  ${return_value}
 
 # =====================
@@ -1645,7 +1539,6 @@ Change_day_to_month
   Sleep     2
   Click Element  xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
-  # : TODO add Squirell here
   Run Keyword If    '${TEST NAME}' == 'Можливість підтвердити оплату першого кандидата'   Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-payment"]
   Run Keyword If    '${TEST NAME}' == 'Можливість підтвердити оплату другого кандидата'   Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-payment"]
   Sleep     2
@@ -1653,7 +1546,6 @@ Change_day_to_month
   Click Element  xpath=//button[@ng-click="decide('active')"]
   Sleep     2
   Click Element  xpath=//button[@ng-click="accept()"]
-  Log To Console    Its ok - qualified
 
 Підтвердити підписання контракту
   [Arguments]  ${username}  ${tender_uaid}  ${award_num}
@@ -1664,7 +1556,6 @@ Change_day_to_month
   Sleep     2
   Input Text   id=contractNumber    Contruct signed
   Click Element  xpath=//button[@ng-click="closeBids()"]
-  Log To Console    Its Ok - contract signed
 
 Отримати кількість документів в ставці
   # Need to find all the documents in the bid
@@ -1682,14 +1573,12 @@ Change_day_to_month
   Click Element     xpath=//div[@class="col-xs-4 status ng-binding pending"]
   Sleep     60
   ${docs_number}=    Get Matching Xpath Count     xpath=//div[@class="type ng-binding"][contains(text(), 'Auction protocol')]
-  Log To Console    Number of docs - '${docs_number}'
   [Return]   ${docs_number}
 
 Отримати дані із документу пропозиції
   [Arguments]  ${username}  ${tender_uaid}  ${bid_index}  ${document_index}  ${field}
   ${doc_title}=     Get WebElements    xpath=//div[contains(text(), 'Auction protocol')]
   ${title}=         Run Keyword If     '${doc_title}' > '0'     Convert To String   auctionProtocol
-  Log To Console    ${title}
   [Return]  ${title}
 
 Скасування рішення кваліфікаційної комісії
@@ -1699,9 +1588,6 @@ Change_day_to_month
   ...      ${ARGUMENTS[0]}  ==  username
   ...      ${ARGUMENTS[1]}  ==  auction_uaid
   ...      ${ARGUMENTS[2]}  ==  docs_number - 0
-  log to console  arg-0 - '${ARGUMENTS[0]}'
-  log to console  arg-1 - '${ARGUMENTS[1]}'
-  log to console  arg-2 - '${ARGUMENTS[2]}'
   Reload Page
   Sleep     2
   newtend.Пошук тендера по ідентифікатору     ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
@@ -1723,7 +1609,6 @@ Change_day_to_month
   \   Reload Page
   \   Sleep     3
   \   ${take_money_btn}=    Get Matching Xpath Count      xpath=//button[@ng-click="secondCancelAward(bidAward, tender)"]
-  \   Log To Console    MONEY BACK BTN - ${take_money_btn}
   \   Exit For Loop If  '${take_money_btn}' > '0'
   \   Sleep     2
   Click Element     xpath=//button[@ng-click="secondCancelAward(bidAward, tender)"]
@@ -1731,7 +1616,6 @@ Change_day_to_month
   Wait Until Page Contains Element      xpath=//div[@ng-click="vm.cancel(vm.award, vm.tender)"]
   Click Element     xpath=//div[@ng-click="vm.cancel(vm.award, vm.tender)"]
   Sleep     3
-  Log To Console    '2-nd place - Took Money Back'
 
 # Winner rejection totally - 1
 Завантажити документ рішення кваліфікаційної комісії
@@ -1758,7 +1642,6 @@ Rejection Protocol
   # Operate for pop-up window
   Wait Until Page Contains Element   xpath=//button[@ng-click="decide('unsuccessful')"]
   ${btns}=  Get Webelements   xpath=//button[@ng-click="decide('unsuccessful')"]
-  Log To Console    ${btns}
   Click Element    ${btns[-1]}
 
 Accept Protocol
@@ -1783,15 +1666,14 @@ Accept Protocol
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
   Wait Until Page Contains Element      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
-  Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0      # may be that will work
-  Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1      # it was award-1
+  Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0
+  Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1
   Sleep     2
-  Wait Until Page Contains Element   xpath=//button[@ng-click="decide('unsuccessful')"]     # new design
-  Click Element     xpath=//button[@ng-click="decide('unsuccessful')"]      # new design
+  Wait Until Page Contains Element   xpath=//button[@ng-click="decide('unsuccessful')"]
+  Click Element     xpath=//button[@ng-click="decide('unsuccessful')"]
   Sleep     2
   Click Element     xpath=//button[@ng-click="disapprove()"]
   Sleep     2
-  Log To Console    Looser will stay alive
 
 
 Завантажити угоду до тендера
@@ -1900,13 +1782,13 @@ Accept Protocol
   Reload Page
   Sleep     30
   Reload Page
-  Click Element     xpath=//a[@ui-sref="tenderView.auction"]       # Navigating to see cancellation reason
+  Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     3
 
 
 Отримати інформацію про cancellations[0].status
   Reload Page
-  Click Element     xpath=//a[@ui-sref="tenderView.auction"]       # Navigating to see cancellation reason
+  Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     3
   # Squirell time
   : FOR     ${INDEX}    IN RANGE    1   15
@@ -1920,14 +1802,12 @@ Accept Protocol
   Sleep     3
   ${return_value}=   Отримати текст із поля і показати на сторінці  cancellations[0].status
   ${return_value}=   convert_Nt_String_To_Common_String     ${return_value}
-  Log To Console     Auction data - ${return_value}
   [Return]      ${return_value}
 
 
 Отримати інформацію про cancellations[0].reason
   ${raw_text}=      Get Webelements     xpath=//div[@class="col-xs-9 ng-binding"]
   ${text}=          Get Text         ${raw_text[-1]}
-  Log To Console    ${text}
   [Return]          ${text}
 
 Отримати інформацію із документа    # Document Title
@@ -1937,7 +1817,6 @@ Accept Protocol
   ...       ${ARGUMENTS[1]} == auction_uaid
   ...       ${ARGUMENTS[2]} == doc_id
   ...       ${ARGUMENTS[3]} == field
-  # ${username}  ${tender_uaid}  ${doc_id}  ${field}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Click Element     xpath=//a[@ui-sref="tenderView.documents"]
   Sleep     3
   Run Keyword If   '${ARGUMENTS[0]}' != 'Newtend_Viewer'    Wait Until Page Contains Element   xpath=//a[@class="ng-binding"]
@@ -1949,9 +1828,7 @@ Accept Protocol
 Отримати документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
   ${file_name}=   Get Text   xpath=//a[contains(text(), '${doc_id}')]
-  Log To Console    file name - ${file_name}
   ${url}=   Get Element Attribute   xpath=//a[contains(text(), '${doc_id}')]@href
-  Log To Console   URL - ${url}
   download_file   ${url}  ${file_name}  ${OUTPUT_DIR}
   [Return]  ${file_name}
 
@@ -1965,9 +1842,6 @@ Accept Protocol
   ...       ${ARGUMENTS[1]} == auction_uaid
   ...       ${ARGUMENTS[2]} == auction_protocol_path
   # Navigate to trades tab
-  log to console  arg0 - '${ARGUMENTS[0]}'
-  log to console  arg1 - '${ARGUMENTS[1]}'
-  log to console  arg2 - '${ARGUMENTS[2]}'
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
   : FOR     ${INDEX}    IN RANGE    1   10
@@ -1996,15 +1870,11 @@ Accept Protocol
   Click Element     xpath=//button[@ng-click="vm.setAwardVerified(vm.files[0], vm.award, vm.tender)"]
   Sleep     15
 
-
 Підтвердити наявність протоколу аукціону
   [Arguments]   @{ARGUMENTS}
   [Documentation]
   ...       ${ARGUMENTS[0]} == auction_uaid
   ...       ${ARGUMENTS[1]} == index
-  Log To Console    arg0 - '${ARGUMENTS[0]}'
-  Log To Console    arg1 - '${ARGUMENTS[1]}'
   ${response}=      Run Keyword If   'Неможливість змінити статус' in '${TEST NAME}'     '${False}'
   ${response}=      Run Keyword If   'Можливість підтвердити наявність протоколу аукціону' in '${TEST NAME}'   Log To Console   ok
-  Log To Console    response - '${response}'
   [Return]     ${response}

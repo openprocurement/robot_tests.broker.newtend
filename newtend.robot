@@ -1670,7 +1670,13 @@ Accept Protocol
   # Confirm looser
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
-  Wait Until Page Contains Element      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
+  : FOR     ${INDEX}    IN RANGE    1   15
+  \   log To Console    -==Squirell in progress==-
+  \   Sleep     3
+  \   ${bidders}=   Get Matching Xpath Count      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
+  \   Exit For Loop If      '${bidders}' > '0'
+  \   Reload Page
+  \   Sleep     5
   Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0
   Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1
   Sleep     2

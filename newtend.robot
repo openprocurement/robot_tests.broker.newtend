@@ -83,7 +83,6 @@ ${locator.e_logo}                           xpath=//a[@href="#/home/?pageNum=1&q
   ${tender_data}=   update_data_for_newtend_new   ${role_name}   ${tender_data}
   [Return]   ${tender_data}
 
-
 Підготувати клієнт для користувача
   [Arguments]  @{ARGUMENTS}
   [Documentation]  Відкрити браузер, створити об’єкт api wrapper, тощо
@@ -475,13 +474,21 @@ Login
   Focus             id=update-tender-btn
   Click Element     id=update-tender-btn
   Sleep     5
-  Run Keyword If   'Неможливість' in '${TEST NAME}'           '${False}'
+  Run Keyword If   'Неможливість' in '${TEST NAME}'            Break me
   Run Keyword If   '${ARGUMENTS[2]}' == 'value.amount'         Change Budget  ${ARGUMENTS[3]}
   Run Keyword If   '${ARGUMENTS[2]}' == 'minimalStep.amount'   Change Amount  ${ARGUMENTS[3]}
   Run Keyword If   '${ARGUMENTS[2]}' == 'guarantee.amount'  Change Guarantee  ${ARGUMENTS[3]}
   Log To COnsole    ==Executing - ${ARGUMENTS[2]}==
   Sleep     3
 
+Break me
+  Sleep     2
+  Focus     id=update-btn
+  Sleep     1
+  Click Element     id=update-btn
+  Sleep     2
+  Click Element     id=none
+  Sleep     1
 
 Change Budget
   [Arguments]   ${amount}
@@ -498,7 +505,6 @@ Change Budget
   Sleep     2
   Click Element    id=update-btn
   Sleep     2
-
 
 Change Amount
   [Arguments]   ${amount}
@@ -786,7 +792,6 @@ Check sign.waiting_1
   ${bidders_raw}=   Get Text    id=min-number-of-qualified-bids
   ${bidders}=       Convert To Integer  ${bidders_raw}
   [Return]      ${bidders}
-
 
 Отримати інформацію про guarantee.amount
   # New field check add
@@ -1334,6 +1339,7 @@ Check changed step.amount
   Reload Page
   : FOR   ${INDEX}   IN RANGE    1    30
   \   Log To Console   .   no_newline=true
+  \   Reload Page
   \   sleep     3
   \   ${count}=   Get Matching Xpath Count   xpath=//button[@ng-click="placeBid()"]
   \   Exit For Loop If   '${count}' == '1'
@@ -1465,7 +1471,6 @@ Check changed step.amount
   ${result}=    Get Element Attribute   xpath=//a[@target="_blank"]@href
   ${result}=    Convert To String  ${result}
   [Return]  ${result}
-
 
 Отримати посилання на аукціон для учасника
   [Arguments]  @{ARGUMENTS}
@@ -1665,7 +1670,13 @@ Accept Protocol
   # Confirm looser
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     2
-  Wait Until Page Contains Element      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
+  : FOR     ${INDEX}    IN RANGE    1   15
+  \   log To Console    -==Squirell in progress==-
+  \   Sleep     3
+  \   ${bidders}=   Get Matching Xpath Count      xpath=//div[@ui-sref="tenderView.bid({bidId: bid.id, lotId: lot.id})"]
+  \   Exit For Loop If      '${bidders}' > '0'
+  \   Reload Page
+  \   Sleep     5
   Run Keyword If   'першого кандидата' in '${TEST NAME}'    Click Element   id=award-0
   Run Keyword If   'другого кандидата' in '${TEST NAME}'    Click Element   id=award-1
   Sleep     2
@@ -1674,7 +1685,6 @@ Accept Protocol
   Sleep     2
   Click Element     xpath=//button[@ng-click="disapprove()"]
   Sleep     2
-
 
 Завантажити угоду до тендера
   [Arguments]  @{ARGUMENTS}
@@ -1785,7 +1795,6 @@ Accept Protocol
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
   Sleep     3
 
-
 Отримати інформацію про cancellations[0].status
   Reload Page
   Click Element     xpath=//a[@ui-sref="tenderView.auction"]
@@ -1803,7 +1812,6 @@ Accept Protocol
   ${return_value}=   Отримати текст із поля і показати на сторінці  cancellations[0].status
   ${return_value}=   convert_Nt_String_To_Common_String     ${return_value}
   [Return]      ${return_value}
-
 
 Отримати інформацію про cancellations[0].reason
   ${raw_text}=      Get Webelements     xpath=//div[@class="col-xs-9 ng-binding"]

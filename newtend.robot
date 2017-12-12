@@ -1018,7 +1018,10 @@ Check changed step.amount
 
 Отримати інформацію із unit.code
   [Arguments]   ${field_name}
-  Fail  Не реалізований функціонал
+  ${unit_code_field}=   Get webelement   xpath=//div[@ng-repeat="item in tender.items track by $index"][contains(., '${field_name}')]//span[@class="unit-code ng-binding"]
+  ${unit_code}=         Get Text         ${unit_code_field}
+  Log To Console    -==CODE - ${unit_code}==-
+  [Return]  ${unit_code}
 
 додати предмети закупівлі
   [Arguments]  @{ARGUMENTS}

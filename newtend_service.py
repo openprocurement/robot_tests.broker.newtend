@@ -34,8 +34,18 @@ def update_data_for_newtend(tender_data):
 
 def update_data_for_newtend_new(role_name, tender_data):
     if role_name == 'tender_owner':
-        tender_data['data']['procuringEntity']['name'] = u"Organizer trader"
+        tender_data['data']['assetCustodian']['identifier']['id'] = u"987987"
+        tender_data['data']['assetCustodian']['identifier']['scheme'] = u"UA-EDR"
+        tender_data['data']['assetCustodian']['identifier']['legalName'] = u"Privatizun test K"
+        tender_data['data']['assetCustodian']['contactPoint']['name'] = u"Privatizun test K"
+        tender_data['data']['assetCustodian']['contactPoint']['telephone'] = u"+380633959229"
+        tender_data['data']['assetCustodian']['contactPoint']['email'] = u"newttest78+501@gmail.com"
     return tender_data
+
+
+def convert_to_float(value):
+    converted_float = float(value)
+    return converted_float
 
 
 # This works in code
@@ -72,6 +82,26 @@ def to_iso_date(date_from_ui):
     if len(time_zone) > 4:
         time_zone = time_zone[0:3] + ':' + time_zone[3:]
     return just_time + time_zone
+
+
+def convert_nt_string_to_ssp_string(string):
+    return {
+        # assets statuses
+        u'complete': u'об’єкт зареєстровано',
+        u'registering': u'об’єкт реєструється',
+        u'unknown': u'невідомо (не застосовується)',
+        u'Опубліковано. Очікування інформаційного повідомлення.': u'pending',
+        u'Опубліковано': u'pending',
+        u'об’єкт зареєстровано': u'complete',
+        u'Виключено з переліку': u'deleted',
+        u"Інформація про оприлюднення інформаційного повідомлення": u"informationDetails",
+        # unit name
+        u"square metre": u"метри квадратні",
+        u"piece": u"штуки",
+        u"метры квадратные": u"метри квадратні",
+        u"": u"",
+
+    }.get(string, string)
 
 
 def convert_nt_string_to_common_string(string):
@@ -112,7 +142,7 @@ def convert_nt_string_to_common_string(string):
         u'К участию допускаются только лицензированные финансовые учреждения.': u'Only licensed financial institutions are eligible to participate.',
         u'Law requirements': u'dgfFinancialAssets',
         u'Права вимоги за кредитами': u'dgfFinancialAssets',
-        u'Аукціон з оренди': u'dgfOtherAssets',     # new vision of life
+        u'Аукціон з оренди': u'dgfOtherAssets',  # new vision of life
         u'Майно банків': u'dgfOtherAssets',
         u'Assets of banks': u'dgfOtherAssets',
         u'Юридична Інформація Майданчиків': u'x_dgfPlatformLegalDetails',
@@ -141,7 +171,7 @@ def convert_nt_string_to_common_string(string):
         u'Голандський аукціон': u'dgfInsider',
         u'Голландский аукцион': u'dgfInsider',
         u'Dutch': u'dgfInsider',
-        u'CAV classificator': u'CPV',    #  u'CAV-PS',   # CAV was previously
+        u'CAV classificator': u'CPV',  # u'CAV-PS',   # CAV was previously
         u"Код відповідного класифікатору лоту": u"CPV",  # CAV was
         u"Код соответствующего классификатора лота": u"CPV",  # CAV was
         u"Додатковий класифікатор": u"PA01-7",  # PA01-7 was
@@ -150,6 +180,11 @@ def convert_nt_string_to_common_string(string):
         u"Лот скасовано": u"active",
         u'VAT incl': True,
         u'з ПДВ': True,
-        u'Used tractors': 'Трактори, що були у використанні',
+        u'Used tractors': u'Трактори, що були у використанні',
+        u'pending': u'Опубліковано. Очікування інформаційного повідомлення'
     }.get(string, string)
 
+
+def get_index(value, add):
+    index = int(value) + int(add)
+    return str(index)

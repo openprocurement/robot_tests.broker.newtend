@@ -74,7 +74,10 @@ def convert_newtend_date_to_iso_format(date_time_from_ui):
 
 
 def to_iso_date(date_from_ui):
-    date_obj = datetime.strptime(date_from_ui, "%Y-%m-%d %H:%M:%S")
+    try:
+        date_obj = datetime.strptime(date_from_ui, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        date_obj = datetime.strptime(date_from_ui, "%Y-%m-%d %H:%M")
     time_zone = timezone('Europe/Kiev')
     localized_date = time_zone.localize(date_obj)
     just_time = localized_date.strftime('%Y-%m-%dT%H:%M:%S')
@@ -95,6 +98,7 @@ def convert_nt_string_to_ssp_string(string):
         u'об’єкт зареєстровано': u'complete',
         u'Виключено з переліку': u'deleted',
         u"Інформація про оприлюднення інформаційного повідомлення": u"informationDetails",
+        u'Обʼєкт виключено': u'deleted',
         # unit name
         u"square metre": u"метри квадратні",
         u"piece": u"штуки",
@@ -188,3 +192,12 @@ def convert_nt_string_to_common_string(string):
 def get_index(value, add):
     index = int(value) + int(add)
     return str(index)
+
+
+def adapt_name_field(name_field):
+    return {
+        'value.amount': 'value',
+        'minimalStep.amount': 'minimal-step',
+        'guarantee.amount': 'guarantee',
+        'registrationFee.amount': 'registration-fee'
+    }.get(name_field, name_field)

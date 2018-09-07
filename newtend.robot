@@ -169,9 +169,9 @@ Login
   ${decisionTitleEn}=  Get From Dictionary     ${decisions[0]}   title_en
   ${decisionTitleRu}=  Get From Dictionary     ${decisions[0]}   title_ru
   # Decisions fill
-  Click Element     id=asset-create-decisions-0-decsion-ща-link-value
+  Click Element     id=asset-create-decisions-0-decision-link-value
   Sleep    2
-  Click Element     id=asset-create-decisions-0-decsion-ща-menu-item-asset
+  Click Element     id=asset-create-decisions-0-decision-menu-item-asset
   Sleep    1
   Click Element     id=asset-create-decisions-0-id
   Input Text        id=asset-create-decisions-0-id       ${decisionID}
@@ -618,7 +618,7 @@ Login
 # Edit Asset
 Внести зміни в об'єкт МП
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
-  newtend.Перейти до редагування Asset  ${username}  ${tender_uaid}
+  newtend.Перейти до редагування  ${username}  ${tender_uaid}  asset
   Clear Element Text  xpath=//input[@id='asset-${fieldname}']
   Input Text  xpath=//input[@id='asset-${fieldname}']  ${fieldvalue}
   newtend.Зберегти після редагування
@@ -626,19 +626,18 @@ Login
 
 Внести зміни в актив об'єкта МП
   [Arguments]  ${username}  ${item_id}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
-  newtend.Перейти до редагування Asset  ${username}  ${tender_uaid}
+  newtend.Перейти до редагування  ${username}  ${tender_uaid}  asset
   ${quantity}=  Convert To String  ${fieldvalue}
   Run Keyword If   '${fieldname}' == 'quantity'
   ...  Run Keywords
-  ...  Clear Element Text  id=asset-create-0-quantity
-  ...  AND  Input Text  id=asset-create-0-quantity  ${quantity}
+  ...  Clear Element Text  id=asset-create-${item_id}-quantity
+  ...  AND  Input Text  id=asset-create-${item_id}-quantity  ${quantity}
   newtend.Зберегти після редагування
   Sleep  2
 
 Додати актив до об'єкта МП
   [Arguments]  ${username}  ${tender_uaid}  ${item}
-  newtend.Перейти до редагування Asset  ${username}  ${tender_uaid}
-  Sleep  1
+  newtend.Перейти до редагування  ${username}  ${tender_uaid}  asset
   Focus  id=asset-create-0-btn-add-item
   Sleep  1
   Click Element  id=asset-create-0-btn-add-item
@@ -652,8 +651,9 @@ Login
   Sleep  1
   Click Element  xpath=//button[@id="select-classifier-btn"]
   Sleep  1
+  ${id}=  Set Variable  ${item.description.split(':')[0]}
   ${item_quantity}=  Convert To String  ${item.quantity}
-  Input Text  xpath=//input[@id='asset-create-1-quantity']  ${item_quantity}
+  Input Text  id=asset-create-${id}-quantity  ${item_quantity}
   Click Element  id=asset-create-1-unit-link-value
   Sleep  2
   ${unit_name_field}=  Get Webelements  xpath=//a[contains(text(), '${item.unit.name}')]
@@ -696,12 +696,12 @@ Login
   Sleep  1
   Click Element  id=create-lot-btn
   Sleep  2
-  Input Text  id=lot-create-1-decsion-date-date  ${tender_data.data.decisions[0].decisionDate}
-  Click Element  id=lot-create-1-decsion-ща-link-value
+  Input Text  id=lot-create-0-decsion-date-date  ${tender_data.data.decisions[0].decisionDate}
+  Click Element  id=lot-create-0-decision-link-value
   Sleep  1
-  Click Element  id=lot-create-1-decsion-ща-menu-item-lot
-  Input Text  xpath=//input[@id='lot-create-1-id']  ${tender_data.data.decisions[0].decisionID}
-  Input Text  id=lot-create-sandbox-parameters   quick, accelerator=360
+  Click Element  id=lot-create-0-decision-menu-item-lot
+  Input Text  xpath=//input[@id='lot-create-0-id']  ${tender_data.data.decisions[0].decisionID}
+  Input Text  id=lot-create-sandbox-parameters   quick, accelerator=180
   Click Element  id=submit-btn
   Sleep  10
   Focus  id=set-composing-btn
@@ -767,20 +767,37 @@ Login
   Input Text  xpath=//input[@object-id='lot-auctions-procurement-method-details']  quick, accelerator=360
   # ${auction.procurementMethodDetails}
   Click Element  id=set-verification-btn
-  Sleep  3
+  Sleep  5
   Click Element  id=set-verification-btn
   Sleep  3
 
 Внести зміни в лот
   [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
-  newtend.Пошук лоту по ідентифікатору  ${username}  ${tender_uaid}
-  Focus  id=edit-btn
-  Sleep  1
-  Click Element  id=edit-btn
+  newtend.Перейти до редагування  ${username}  ${tender_uaid}  lot
   Clear Element Text  id=lot-${fieldname}
   Input Text  id=lot-${fieldname}  ${fieldvalue}
   Click Element  id=btn-save
   Sleep  3
+
+Внести зміни в актив лоту
+   [Arguments]  ${username}  ${item_id}  ${tender_uaid}  ${field_name}  ${field_value}
+   newtend.Перейти до редагування  ${username}  ${tender_uaid}  lot
+   ${quantity}=  Convert To String  ${fieldvalue}
+   Run Keyword If   '${fieldname}' == 'quantity'
+   ...  Run Keywords
+   ...  Clear Element Text  id=lot-items-${item_id}-quantity
+   ...  AND  Input Text  id=lot-items-${item_id}-quantity  ${quantity}
+   newtend.Зберегти після редагування
+   Sleep  2
+
+Внести зміни в умови проведення аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}  ${index}
+  newtend.Перейти до редагування  ${username}  ${tender_uaid}  lot
+  ${name_field}=  adapt_name_field  ${fieldname}
+  ${value}=  Convert To String  ${fieldvalue}
+  Run Keyword If  '${fieldname}' != 'auctionPeriod.startDate'  Edit amount field auctions  ${name_field}  ${value}
+  Run Keyword If  '${fieldname}' == 'auctionPeriod.startDate'  Edit date auctions  ${fieldvalue}
+  newtend.Зберегти після редагування
 
 # INFO LOT
 Отримати інформацію із лоту
@@ -791,16 +808,20 @@ Login
   Run Keyword And Return    Get Text    xpath=//*[@id="lot-view-lot-id"]/span
 
 Отримати інформацію із лоту про status
+  Click Element  xpath=//button[@ng-click='vm.onSyncBtnClick()']
+  Sleep  2
   ${value}=    Get Text    xpath=//*[text()='Статус']/following-sibling::div[1]/span
   Run Keyword And Return    convert_nt_string_to_ssp_string    ${value}
 
 Отримати інформацію із лоту про date
   ${value}=   Get Text    //*[text()='Дата створення']/following-sibling::div[1]/span
-  [Return]    ${value.split(' ')[0]}
+  ${date}=  to_iso_date  ${value}
+  [Return]  ${date}
 
 Отримати інформацію із лоту про rectificationPeriod.endDate
   ${value}=    Get Text    //*[text()='Кінець періоду редагування']/following-sibling::div[1]/span/span
-  [Return]    ${value.split(' ')[0]}
+  ${date}=   to_iso_date  ${value}
+  [Return]  ${date}
 
 Отримати інформацію із лоту про relatedProcesses[0].relatedProcessID
   Run Keyword And Return    Get Text    xpath=//*[text()='Asset ID']/following-sibling::div[1]/span
@@ -839,57 +860,68 @@ Login
   Run Keyword And Return    Get Text    id=lot-view-lot-custodian-contact-point-email
 
 Отримати інформацію із лоту про decisions[${n}].title
-  Run Keyword And Return    Get Text    xpath=(//*[@id="lot-view-decisions-title"])[${n}]
+  ${index}=  get_index  ${n}  1
+  Run Keyword And Return    Get Text    xpath=(//*[@id="lot-view-decisions-title"])[${index}]
 
 Отримати інформацію із лоту про decisions[${n}].decisionDate
-  ${value}=    Get Text    xpath=(//*[@id="lot-view-decisions-decision-date"])[${n}]
+  ${index}=  get_index  ${n}  1
+  ${value}=    Get Text    xpath=(//*[@id="lot-view-decisions-decision-date"])[${index}]
   [Return]    ${value.split(': ')[1].split(' ')[0]}
 
 Отримати інформацію із лоту про decisions[${n}].decisionID
-  ${value}=  Get Text  xpath=(//*[@id="lot-view-decisions-decision-id"])[${n}]
+  ${index}=  get_index  ${n}  1
+  ${value}=  Get Text  xpath=(//*[@id="lot-view-decisions-decision-id"])[${index}]
   [Return]    ${value.split(': ')[1]}
 
 Отримати інформацію із лоту про dateModified
   ${value}=     Get Text    xpath=//*[text()='Дата останнього редагування']/following-sibling::div[1]/span
-  [Return]  ${value.split(' ')[0]}
+  [Return]  ${value}
 
 # INFO AUCTION LOT
 
-#Отримати інформацію із лоту про auctions[${n}].procurementMethodType
+Отримати інформацію із лоту про auctions[${n}].procurementMethodType
+  ${index}=  get_index  ${n}  1
+  ${value}=  Get Text  xpath=(//*[@id="-tender-procurement-method-type"])[${index}]
+  [Return]  ${value}
 
 Отримати інформацію із лоту про auctions[${n}].status
   ${index}=  get_index  ${n}  2
   ${value}=    Get Text    xpath=(//*[text()='Статус']/following-sibling::div[1]/span)[${index}]
   [Return]  ${value}
 
-#Отримати інформацію із лоту про auctions[${n}].tenderAttempts
+Отримати інформацію із лоту про auctions[${n}].tenderAttempts
+  ${index}=  get_index  ${n}  1
+  ${value}=  Get Text  xpath=(//*[@id="-tender-attempts"])[${index}]
+  Run Keyword And Return    Convert To Integer    ${value}
 
 Отримати інформацію із лоту про auctions[${n}].value.amount
   ${index}=  get_index  ${n}  1
   ${value}=    Get Text    xpath=(//*[text()='Стартова ціна об’єкта']/following-sibling::div[1]//span)[${index}]
-  Run Keyword And Return    Convert To Number   ${value.split('  ')[0]}
+  Run Keyword And Return    Convert To Number   ${value.split(' ')[0]}
 
 Отримати інформацію із лоту про auctions[${n}].minimalStep.amount
   ${index}=  get_index  ${n}  1
   ${value}=    Get Text    xpath=(//*[text()='Крок аукціону']/following-sibling::div[1]//span)[${index}]
-  Run Keyword And Return    Convert To Number   ${value.split('  ')[0]}
+  Run Keyword And Return    Convert To Number   ${value.split(' ')[0]}
 
 Отримати інформацію із лоту про auctions[${n}].guarantee.amount
   ${index}=  get_index  ${n}  1
   ${value}=    Get Text    xpath=(//*[text()='Розмір гарантійного внеску']/following-sibling::div[1]//span)[${index}]
-  Run Keyword And Return    Convert To Number   ${value.split('  ')[0]}
+  Run Keyword And Return    Convert To Number   ${value.split(' ')[0]}
 
 Отримати інформацію із лоту про auctions[${n}].registrationFee.amount
   ${index}=  get_index  ${n}  1
   ${value}=    Get Text    xpath=(//*[text()='Розмір реєстраційного внеску']/following-sibling::div[1]//span)[${index}]
-  Run Keyword And Return    Convert To Number   ${value.split('  ')[0]}
+  Run Keyword And Return    Convert To Number   ${value.split(' ')[0]}
 
-#Отримати інформацію із лоту про auctions[${n}].tenderingDuration
+Отримати інформацію із лоту про auctions[${n}].tenderingDuration
+  Run Keyword And Return    Get Text  xpath=(//*[@id="-tender-duration"])[${n}]
 
 Отримати інформацію із лоту про auctions[${n}].auctionPeriod.startDate
   ${index}=  get_index  ${n}  1
   ${value}=    Get Text    xpath=(//*[text()='Дата проведення аукціону']/following-sibling::div[1]//span)[${index}]
-  [Return]  ${value.split(' ')[0]}
+  ${data}=  to_iso_date  ${value}
+  [Return]  ${data}
 
 #Отримати інформацію із лоту про auctions[${n}].auctionID
 
@@ -932,7 +964,7 @@ Login
   Focus     id=document-upload-btn
   Click Element     id=document-upload-btn
   Sleep     3
-  Завантажити документ в лот з типом  ${username}  ${tender_uaid}  ${filepath}  illustration
+  newtend.Завантажити документ в лот з типом  ${username}  ${tender_uaid}  ${filepath}  illustration
 
 Завантажити документ в лот з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${type}
@@ -941,7 +973,7 @@ Login
   Click Element  id=lot-document-upload-document-type-menu-item-${type}
   Sleep  2
   Execute Javascript  $('button[ng-model="vm.files"]').click()
-  Sleep  3
+  Sleep  1
   Choose File  xpath=//input[@id='lot-document-upload-file-name']  ${filepath}
   Sleep  2
   Focus  xpath=//button[@ng-click="vm.upload()"]
@@ -972,22 +1004,20 @@ Login
   Sleep  2
   Click Element  id=delete-btn
 
-#Внести зміни в актив лоту
-#  [Arguments]  ${username}  ${item_id}  ${tender_uaid}  ${field_name}  ${field_value}
-
-#Внести зміни в умови проведення аукціону
-#  [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}  ${index}
-
 # Util_Keywords
-Перейти до редагування Asset
-  [Arguments]  ${username}  ${tender_uaid}
-  newtend.Пошук об’єкта МП по ідентифікатору  ${username}  ${tender_uaid}
-  Execute Javascript  window.scrollTo(0, 800);
-  Click Element At Coordinates  id=edit-btn  -50  0
+Перейти до редагування
+  [Arguments]  ${username}  ${tender_uaid}  ${type}
+  Run Keyword If  '${type}' == 'asset'  newtend.Пошук об’єкта МП по ідентифікатору  ${username}  ${tender_uaid}
+  Run Keyword If  '${type}' == 'lot'  newtend.Пошук лоту по ідентифікатору  ${username}  ${tender_uaid}
+  Focus  id=edit-btn
+  Sleep  1
+  Click Element  id=edit-btn
   Sleep  3
 
 Зберегти після редагування
-  Click Element At Coordinates  xpath=//*[text()='Зберегти']  -40  0
+  Focus  xpath=//*[text()='Зберегти']
+  Sleep  1
+  Click Element  xpath=//*[text()='Зберегти']
   Sleep  2
 
 Пошук
@@ -1041,3 +1071,19 @@ Login
   Click Element  id=lot-auctions-${field}-currency-link-value
   Sleep  1
   Click Element  id=lot-auctions-${field}-currency-menu-item-${currency}
+
+Edit amount field auctions
+  [Arguments]  ${name_field}  ${value}
+  Clear Element Text  id=lot-auctions-${name_field}-amount
+  Input Text  id=lot-auctions-${name_field}-amount  ${value}
+
+Edit date auctions
+  [Arguments]  ${fieldvalue}
+  Clear Element Text  id=lot-auctions-auction-period-date
+  Input Text  id=lot-auctions-auction-period-date  ${fieldvalue.split('T')[0]}
+  ${hours}=  Get Webelements  xpath=//input[@ng-change='updateHours()']
+  Clear Element Text  ${hours[-1]}
+  Input Text  ${hours[-1]}  ${fieldvalue.split('T')[1].split(':')[0]}
+  ${minutes}=  Get Webelements  xpath=//input[@ng-change='updateMinutes()']
+  Clear Element Text  ${minutes[-1]}
+  Input Text  ${minutes[-1]}  ${fieldvalue.split('T')[1].split(':')[1]}

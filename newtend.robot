@@ -559,54 +559,45 @@ Login
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${image_path}
-  # Navigating to documents tab
-  Reload Page
-  Sleep     2
   Focus     id=document-upload-btn
   Click Element     id=document-upload-btn
   Sleep     3
   Click Element  id=asset-document-upload-document-type-link-value
   Sleep  2
   Click Element  id=asset-document-upload-document-type-menu-item-illustration
-  Sleep  2
-  # === Mega Hack for document Upload ===
-  Execute Javascript  $('button[ng-model="file"]').click()
   Sleep  1
-  Choose File         xpath=//input[@id='asset-document-upload-file-name']    ${ARGUMENTS[2]}
+  # === Mega Hack for document Upload ===
+  Execute Javascript  $('#asset-document-upload-to-upload-btn-add').click()
   Sleep  2
+  Choose File         xpath=//input[@type='file']    ${ARGUMENTS[2]}
+  Sleep  1
+  Input Text  xpath=//input[@id='asset-document-upload-title']  ${ARGUMENTS[2].split('/')[-1]}
   Focus  xpath=//button[@ng-click="vm.upload()"]
   # Confirm file Upload
-  Sleep  2
   Click Element     xpath=//button[@ng-click="vm.upload()"]
   Sleep     10
-  # Click Element  id=submit-btn
 
 Завантажити документ в об'єкт МП з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${documentType}
-  Run Keyword If  "${TEST_NAME}" != "Можливість завантажити документ про виключення об'єкта МП з переліку"  Reload Page
-  Sleep  2
   Click Element  id=asset-document-upload-document-type-link-value
   Sleep  2
   Click Element  id=asset-document-upload-document-type-menu-item-${documentType}
+  Execute Javascript  $('#asset-document-upload-to-upload-btn-add').click()
   Sleep  2
-  Execute Javascript  $('button[ng-model="file"]').click()
-  Sleep  3
-  Choose File  xpath=//input[@id='asset-document-upload-file-name']  ${filepath}
-  # Execute Javascript  $('input[id="asset-document-upload-file-name"]').val("${filepath}");
-  Sleep  2
+  Choose File  xpath=//input[@type='file']  ${filepath}
+  Sleep  1
+  Input Text  xpath=//input[@id='asset-document-upload-title']  ${filepath.split('/')[-1]}
   Focus  xpath=//button[@ng-click="vm.upload()"]
-  Sleep  2
   Click Element     xpath=//button[@ng-click="vm.upload()"]
   Sleep  10
-  # Click Element  id=submit-btn
 
 Завантажити документ для видалення об'єкта МП
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}
   Focus  id=document-upload-btn
-  Sleep  2
   Click Element  id=document-upload-btn
+  Sleep  2
   newtend.Завантажити документ в об'єкт МП з типом  ${username}  ${tender_uaid}  ${filepath}  cancellationDetails
-  Sleep  30
+  Sleep  20
 
 Отримати документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
@@ -959,8 +950,6 @@ Login
 
 Завантажити ілюстрацію в лот
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}
-  Reload Page
-  Sleep     2
   Focus     id=document-upload-btn
   Click Element     id=document-upload-btn
   Sleep     3
@@ -971,21 +960,19 @@ Login
   Click Element  id=lot-document-upload-document-type-link-value
   Sleep  2
   Click Element  id=lot-document-upload-document-type-menu-item-${type}
+  Execute Javascript  $('#lot-document-upload-to-upload-btn-add').click()
   Sleep  2
-  Execute Javascript  $('button[ng-model="vm.files"]').click()
+  Choose File  xpath=//input[@type='file']  ${filepath}
   Sleep  1
-  Choose File  xpath=//input[@id='lot-document-upload-file-name']  ${filepath}
-  Sleep  2
+  Input Text  xpath=//input[@id='lot-document-upload-title']  ${filepath.split('/')[-1]}
   Focus  xpath=//button[@ng-click="vm.upload()"]
-  Sleep  2
+  Sleep  1
   Click Element     xpath=//button[@ng-click="vm.upload()"]
-  Sleep  5
-  # Click Element  id=submit-btn
+  Sleep  10
 
 Завантажити документ для видалення лоту
   [Arguments]  ${username}  ${tender_uaid}  ${file_path}
   Focus     id=document-upload-btn
-  Sleep  1
   Click Element     id=document-upload-btn
   Sleep  3
   newtend.Завантажити документ в лот з типом  ${username}  ${tender_uaid}  ${file_path}  cancellationDetails
@@ -998,11 +985,29 @@ Login
   [Arguments]  ${username}  ${tender_uaid}
   newtend.Пошук лоту по ідентифікатору  ${username}  ${tender_uaid}
   Click Element  xpath=//button[@ng-click='vm.onSyncBtnClick()']
+  Sleep  2
   Focus  id=delete-btn
-  Sleep  1
   Click Element  id=delete-btn
   Sleep  2
   Click Element  id=delete-btn
+
+# Auction
+#Пошук тендера по ідентифікатору
+#  [Arguments]  ${username}  ${tender_uaid}
+#  Run Keyword If   '${username}' == 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/auction/#/home/?pageNum=1
+#  Run Keyword If   '${username}' != 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/provider/#/home/?pageNum=1
+#  Sleep  2
+#  : FOR   ${INDEX}  IN RANGE    1   15
+#  \   Log To Console   .   no_newline=true
+#  \   Input Text  xpath=//input[@ng-model='searchData.query']  ${tender_uaid}
+#  \   Click Element     xpath=(//div[@ng-click="search()"])[1]
+#  \   Sleep  2
+#  \   ${auctions}=   Get Matching Xpath Count   xpath=//*[@class="title ng-binding"]
+#  \   Exit For Loop If  '${auctions}' > '0'
+#  \   Sleep  5
+#  \   Reload Page
+#  Click Element     xpath=//*[@class="title ng-binding"]
+#  Sleep  2
 
 # Util_Keywords
 Перейти до редагування
@@ -1022,22 +1027,20 @@ Login
 
 Пошук
   [Arguments]  ${username}  ${obj_id}  ${obj_type}
-  Switch browser   ${BROWSER_ALIAS}
-  Sleep  2
+  # Switch browser   ${BROWSER_ALIAS}
   ${obj_id}=    Convert To String   ${obj_id}
   Run Keyword If   '${username}' == 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/auction/#/privatization/${obj_type}?page=1
   Run Keyword If   '${username}' != 'Newtend_Owner'   Go To    https://cdb2-dev.newtend.com/provider/#/privatization/${obj_type}?page=1
-  Sleep  3
+  Sleep  2
   : FOR   ${INDEX}  IN RANGE    1   15
   \   Log To Console   .   no_newline=true
-  \   Sleep  5
-  \   Reload Page
   \   Input Text        xpath=//input[@ng-model="vm.searchQuery"]     ${obj_id}
   \   Click Element     xpath=//div[@ng-click="vm.refresh()"]
   \   Sleep  2
   \   ${auctions}=   Get Matching Xpath Count   xpath=//*[@class="title ng-binding"]
   \   Exit For Loop If  '${auctions}' > '0'
-  Sleep  2
+  \   Sleep  5
+  \   Reload Page
   Click Element     xpath=//*[@class="title ng-binding"]
   Sleep  2
 

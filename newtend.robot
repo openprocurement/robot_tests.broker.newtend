@@ -142,9 +142,6 @@ Login
   \   ${titles_count}=      Get Matching Xpath Count     xpath=//input[@id="asset-title"]
   \   Exit For Loop If      '${titles_count}' > '0'
   \   Sleep   3
-  # Extracting data
-  # :TODO   Add 'Run Keyword If' statement for uri
-#  ${holderIdUrl}=      Get From Dictionary     ${assetHolderID}    uri
 
   # SSP Main Fields
   ${sspTitileUA}=       Get From Dictionary     ${ARGUMENTS[1].data}    title
@@ -326,19 +323,9 @@ Login
   newtend.Ввести контакти балансоутримувача  contact-point-additional  ${holderAddName}  ${holderAddEmail}  ${holderAddPhone}
   ...  ${holderAddFax}  ${holderAddUrl}
 
-  # Accelerator change
-  Focus     id=asset-create-sandbox-parameters
-  Clear Element Text    id=asset-create-sandbox-parameters
-  Sleep     1
-  Input Text    id=asset-create-sandbox-parameters      quick, accelerator=360
-  Sleep  1
   Focus          id=submit-btn
   Click Element  id=submit-btn
   Sleep     10
-#  : FOR  ${INDEX}   IN RANGE    1   5
-#  \   ${publish}=   Get Webelements     id=publish-btn
-#  \   Run Keyword If  '${publish}' > '0'    Click Element   ${publish[0]}
-#  \   Sleep     4
   Click Element    id=publish-btn
   Sleep     3
   Wait Until Page Contains Element   id=asset-view-asset-id   30
@@ -548,8 +535,6 @@ Login
   ${itemInfo}=   Get Webelement   xpath=//div[@class="privatization-item-list-item"][contains(., '${itemId}')]/..//div[@id="reg-details-status-"]
   ${iStatus}=    Get Text    ${itemInfo}
   ${iStatus}=    convert_nt_string_to_ssp_string    ${iStatus}
-#  ${iStatus}=    Get Regexp Matches   ${text}    {"status":"(.+?)"}   1
-#      Get From List  ${iStatus}  0
   [Return]  ${iStatus}
 
 # Docs Upload Process
@@ -692,7 +677,7 @@ Login
   Sleep  1
   Click Element  id=lot-create-0-decision-menu-item-lot
   Input Text  xpath=//input[@id='lot-create-0-id']  ${tender_data.data.decisions[0].decisionID}
-  Input Text  id=lot-create-sandbox-parameters   quick, accelerator=180
+  Input Text  id=lot-create-sandbox-parameters   ${tender_data.data.sandboxParameters}
   Click Element  id=submit-btn
   Sleep  10
   Focus  id=set-composing-btn
@@ -755,8 +740,7 @@ Login
 Додати умови проведення аукціону 1
   [Arguments]  ${username}  ${tender_uaid}  ${auction}
   Input Text  xpath=//input[@id='lot-auctions-tendering-duration-hidden']  ${auction.tenderingDuration}
-  Input Text  xpath=//input[@object-id='lot-auctions-procurement-method-details']  quick, accelerator=360
-  # ${auction.procurementMethodDetails}
+  Input Text  xpath=//input[@object-id='lot-auctions-procurement-method-details']  ${auction.procurementMethodDetails}
   Click Element  id=set-verification-btn
   Sleep  5
   Click Element  id=set-verification-btn
@@ -914,8 +898,6 @@ Login
   ${data}=  to_iso_date  ${value}
   [Return]  ${data}
 
-#Отримати інформацію із лоту про auctions[${n}].auctionID
-
 # INFO ASSET LOT
 Отримати інформацію з активу лоту
   [Arguments]  ${username}  ${tender_uaid}  ${item}  ${fieldname}
@@ -978,8 +960,26 @@ Login
   newtend.Завантажити документ в лот з типом  ${username}  ${tender_uaid}  ${file_path}  cancellationDetails
   Sleep  20
 
-#Завантажити документ в умови проведення аукціону
-#  [Arguments]  ${username}  ${tender_uaid}  ${file_path}  ${doc_type}  ${index}
+Завантажити документ в умови проведення аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${file_path}  ${doc_type}  ${index}
+  newtend.Пошук лоту по ідентифікатору  ${username}  ${tender_uaid}
+  Focus     id=edit-btn
+  Click Element     id=edit-btn
+  Sleep  3
+  Click Element  id=lot-auction-document-upload-document-type-link-value
+  Sleep  2
+  Click Element  id=lot-auction-document-upload-document-type-menu-item-${doc_type}
+  Execute Javascript  $('#lot-auction-document-upload-to-upload-btn-add').click()
+  Sleep  2
+  Choose File  xpath=//input[@type='file']  ${file_path}
+  Sleep  1
+  Input Text  xpath=//input[@id='lot-auction-document-upload-title']  ${filepath.split('/')[-1]}
+  Focus  xpath=//button[@ng-click="vm.upload()"]
+  Sleep  1
+  Click Element     xpath=//button[@ng-click="vm.upload()"]
+  Sleep  5
+  Click Element  id=btn-save
+  Sleep  5
 
 Видалити лот
   [Arguments]  ${username}  ${tender_uaid}
@@ -990,24 +990,6 @@ Login
   Click Element  id=delete-btn
   Sleep  2
   Click Element  id=delete-btn
-
-# Auction
-#Пошук тендера по ідентифікатору
-#  [Arguments]  ${username}  ${tender_uaid}
-#  Run Keyword If   '${username}' == 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/auction/#/home/?pageNum=1
-#  Run Keyword If   '${username}' != 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/provider/#/home/?pageNum=1
-#  Sleep  2
-#  : FOR   ${INDEX}  IN RANGE    1   15
-#  \   Log To Console   .   no_newline=true
-#  \   Input Text  xpath=//input[@ng-model='searchData.query']  ${tender_uaid}
-#  \   Click Element     xpath=(//div[@ng-click="search()"])[1]
-#  \   Sleep  2
-#  \   ${auctions}=   Get Matching Xpath Count   xpath=//*[@class="title ng-binding"]
-#  \   Exit For Loop If  '${auctions}' > '0'
-#  \   Sleep  5
-#  \   Reload Page
-#  Click Element     xpath=//*[@class="title ng-binding"]
-#  Sleep  2
 
 # Util_Keywords
 Перейти до редагування
@@ -1027,7 +1009,6 @@ Login
 
 Пошук
   [Arguments]  ${username}  ${obj_id}  ${obj_type}
-  # Switch browser   ${BROWSER_ALIAS}
   ${obj_id}=    Convert To String   ${obj_id}
   Run Keyword If   '${username}' == 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/auction/#/privatization/${obj_type}?page=1
   Run Keyword If   '${username}' != 'Newtend_Owner'   Go To    https://cdb2-dev.newtend.com/provider/#/privatization/${obj_type}?page=1

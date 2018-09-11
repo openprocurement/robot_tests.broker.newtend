@@ -97,8 +97,10 @@ def convert_nt_string_to_ssp_string(string):
         u'Опубліковано': u'pending',
         u'об’єкт зареєстровано': u'complete',
         u'Виключено з переліку': u'deleted',
+        # lot statuses
         u"Інформація про оприлюднення інформаційного повідомлення": u"informationDetails",
         u'Об’єкт виключено': u'deleted',
+        u'Аукціон': u'active.auction',
         # unit name
         u"square metre": u"метри квадратні",
         u"piece": u"штуки",

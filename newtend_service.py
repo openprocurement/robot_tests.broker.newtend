@@ -2,8 +2,8 @@
 
 from datetime import datetime
 from pytz import timezone
-from iso8601 import parse_date
-from op_robot_tests.tests_files.service_keywords import get_now
+# from iso8601 import parse_date
+# from op_robot_tests.tests_files.service_keywords import get_now
 from calendar import monthrange
 import urllib
 
@@ -101,6 +101,22 @@ def convert_nt_string_to_ssp_string(string):
         u"Інформація про оприлюднення інформаційного повідомлення": u"informationDetails",
         u'Об’єкт виключено': u'deleted',
         u'Аукціон': u'active.auction',
+        u'Аукцион': u'active.auction',
+        # procedure statuses
+        u'Пропозиції': u'active.tendering',
+        u'Bids': u'active.tendering',
+        u'Auction': u'active.auction',
+        u'Не відбувся': u'unsuccessful',
+        u'Failed': u'unsuccessful',
+        u'Auction cancelled': u'cancelled',
+        u'Торги відмінено': u'cancelled',
+        u'Кваліфікація': u'active.qualification',
+        u'Qualification': u'active.qualification',
+        u'Completed': u'complete',
+        u'Завершено': u'complete',
+        # award statuses
+        u'Очікує на рішення': u'pending',
+        u'Expecting decision': u'pending',
         # unit name
         u"square metre": u"метри квадратні",
         u"piece": u"штуки",
@@ -203,3 +219,26 @@ def adapt_name_field(name_field):
         'guarantee.amount': 'guarantee',
         'registrationFee.amount': 'registration-fee'
     }.get(name_field, name_field)
+
+
+def get_xpath_question(qid, field):
+    return {
+        'title': '//*[@ng-repeat="question in questions"][contains(., "{}")]//span[@class="user ng-binding"]'.format(qid),
+        'description': '//*[@ng-repeat="question in questions"][contains(., "{}")]//span[@class="question-description ng-binding"]'.format(qid),
+        'answer': '//*[@ng-repeat="question in questions"][contains(., "{}")]//span[@class="answer-description ng-binding"]'.format(qid)
+    }.get(field, field)
+
+
+def wait_status(test_name):
+    name = test_name.split('\'')[1]
+    return {
+        u'очікується протокол': [u'Очікує на рішення', u'Expecting decision'],
+        u'очікується завантаження контракту': [u'Очікується підписання контракту', u'Expected the signing of the contract']
+    }.get(name)
+
+
+
+
+
+
+

@@ -118,10 +118,12 @@ Login
 # Changing the Language to Ukraine
   Click Element    xpath=//a[@ng-click="vm.setLanguage('uk')"]
   Sleep     3
-  Click Element     xpath=//a[@class="ng-binding ng-scope dropdown-toggle"]
-  Sleep     2
-  Click Element     xpath=//a[@href="/auction"]
-  Sleep     3
+  Run Keyword If  '${ARGUMENTS[0]}' == 'Newtend_Owner'
+  ...  Run Keywords
+  ...  Click Element     xpath=//a[@class="ng-binding ng-scope dropdown-toggle"]
+  ...  AND  Sleep     2
+  ...  AND  Click Element     xpath=//a[@href="/auction"]
+  ...  AND  Sleep     3
   Log To Console   Success logging in as Some one - ${ARGUMENTS[0]}
 
 # ===================================
@@ -255,10 +257,13 @@ Login
   \   Focus            id=asset-create-items-${INDEX}-rd-status-link-value
   \   Sleep     1
   \   Click Element    id=asset-create-items-${INDEX}-rd-status-link-value
-  \   ${registrationStatus}=    convert_nt_string_to_ssp_string      ${registrationStatus}
-  \   ${status}=       Get Webelements     xpath=//a[contains(text(), '${registrationStatus}')]
+  \   ${adaptRegistrationStatus}=    convert_nt_string_to_ssp_string      ${registrationStatus}
+  \   ${status}=       Get Webelements     xpath=//a[contains(text(), '${adaptRegistrationStatus}')]
   \   Click Element    ${status[-1]}
-  \   Sleep     2
+  \   Sleep  2
+  \   Run Keyword If  '${registrationStatus}' == 'complete'  Run Keywords
+  \  ...  Input Text  xpath=//input[@id='asset-create-items-${item_description.split(':')[0]}-rd-id']  555
+  \  ...  AND  Input Text  id=asset-create-items-${item_description.split(':')[0]}-rd-date-date  ${decisionDate}
   \  ${new_item_cross}=    Get Webelements     xpath=//a[@ng-click="vm.addItemClick()"]
   \  Run Keyword If   '${INDEX}' < '${item_number}'   Click Element    ${new_item_cross[-1]}
 
@@ -557,10 +562,10 @@ Login
   Choose File         xpath=//input[@type='file']    ${ARGUMENTS[2]}
   Sleep  1
   Input Text  xpath=//input[@id='asset-document-upload-title']  ${ARGUMENTS[2].split('/')[-1]}
-  Focus  xpath=//button[@ng-click="vm.upload()"]
+  Focus  id=asset-document-upload-upload-btn
   # Confirm file Upload
-  Click Element     xpath=//button[@ng-click="vm.upload()"]
-  Sleep     10
+  Click Element  id=asset-document-upload-upload-btn
+  Sleep  10
 
 Завантажити документ в об'єкт МП з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${documentType}
@@ -572,8 +577,8 @@ Login
   Choose File  xpath=//input[@type='file']  ${filepath}
   Sleep  1
   Input Text  xpath=//input[@id='asset-document-upload-title']  ${filepath.split('/')[-1]}
-  Focus  xpath=//button[@ng-click="vm.upload()"]
-  Click Element     xpath=//button[@ng-click="vm.upload()"]
+  Focus  id=asset-document-upload-upload-btn
+  Click Element  id=asset-document-upload-upload-btn
   Sleep  10
 
 Завантажити документ для видалення об'єкта МП
@@ -662,9 +667,10 @@ Login
   Sleep  1
   Click Element  id=delete-btn
   Sleep  2
+  Focus  id=delete-btn
   Click Element  id=delete-btn
 
-#Lot
+#Lot--------------------------------------------------------------------------------------------------------------------
 Створити лот
   [Arguments]  ${username}  ${tender_data}  ${asset_uaid}
   newtend.Пошук об’єкта МП по ідентифікатору  ${username}  ${asset_uaid}
@@ -794,6 +800,8 @@ Login
   [Return]  ${date}
 
 Отримати інформацію із лоту про rectificationPeriod.endDate
+  Click Element  xpath=//button[@ng-click='vm.onSyncBtnClick()']
+  Sleep  2
   ${value}=    Get Text    //*[text()='Кінець періоду редагування']/following-sibling::div[1]/span/span
   ${date}=   to_iso_date  ${value}
   [Return]  ${date}
@@ -898,6 +906,12 @@ Login
   ${data}=  to_iso_date  ${value}
   [Return]  ${data}
 
+Отримати інформацію із лоту про auctions[${n}].auctionID
+  Click Element  xpath=//button[@ng-click='vm.onSyncBtnClick()']
+  Sleep  2
+  ${index}=  get_index  ${n}  1
+  Run Keyword And Return  Get Text  xpath=(//*[@id="-auction-id"])[${index}]
+
 # INFO ASSET LOT
 Отримати інформацію з активу лоту
   [Arguments]  ${username}  ${tender_uaid}  ${item}  ${fieldname}
@@ -947,9 +961,9 @@ Login
   Choose File  xpath=//input[@type='file']  ${filepath}
   Sleep  1
   Input Text  xpath=//input[@id='lot-document-upload-title']  ${filepath.split('/')[-1]}
-  Focus  xpath=//button[@ng-click="vm.upload()"]
+  Focus  id=lot-document-upload-upload-btn
   Sleep  1
-  Click Element     xpath=//button[@ng-click="vm.upload()"]
+  Click Element  id=lot-document-upload-upload-btn
   Sleep  10
 
 Завантажити документ для видалення лоту
@@ -974,9 +988,9 @@ Login
   Choose File  xpath=//input[@type='file']  ${file_path}
   Sleep  1
   Input Text  xpath=//input[@id='lot-auction-document-upload-title']  ${filepath.split('/')[-1]}
-  Focus  xpath=//button[@ng-click="vm.upload()"]
+  Focus  id=lot-auction-document-upload-upload-btn
   Sleep  1
-  Click Element     xpath=//button[@ng-click="vm.upload()"]
+  Click Element  id=lot-auction-document-upload-upload-btn
   Sleep  5
   Click Element  id=btn-save
   Sleep  5
@@ -989,9 +1003,369 @@ Login
   Focus  id=delete-btn
   Click Element  id=delete-btn
   Sleep  2
+  Focus  id=delete-btn
   Click Element  id=delete-btn
 
-# Util_Keywords
+# Procedure-------------------------------------------------------------------------------------------------------------
+Активувати процедуру
+  [Arguments]  ${username}  ${tender_uaid}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+
+Пошук тендера по ідентифікатору
+  [Arguments]  ${username}  ${tender_uaid}
+  Run Keyword If   '${username}' == 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/auction/#/home/?pageNum=1
+  Run Keyword If   '${username}' != 'Newtend_Owner'    Go To    https://cdb2-dev.newtend.com/provider/#/home/?pageNum=1
+  Sleep  2
+  : FOR   ${INDEX}  IN RANGE    1   15
+  \   Log To Console   .   no_newline=true
+  \   Input Text  xpath=//input[@ng-model='searchData.query']  ${tender_uaid}
+  \   Click Element     xpath=(//div[@ng-click="search()"])[1]
+  \   Sleep  2
+  \   ${auctions}=   Get Matching Xpath Count   xpath=//*[@class="title ng-binding"]
+  \   Exit For Loop If  '${auctions}' > '0'
+  \   Sleep  5
+  \   Reload Page
+  Click Element     xpath=//*[@class="title ng-binding"]
+  Sleep  2
+
+Оновити сторінку з тендером
+  [Arguments]  @{ARGUMENTS}
+  Switch browser   ${BROWSER_ALIAS}
+  Reload Page
+  Sleep     2
+
+Задати запитання на тендер
+  [Arguments]  ${username}  ${auction_uaid}  ${question_data}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${auction_uaid}
+  Click Element  xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep  2
+  Click Element  xpath=//button[@ng-click="askQuestion()"]
+  Sleep  2
+  Input Text  xpath=//input[@ng-model="chatData.title"]  ${question_data.data.title}
+  Select From List By Label  xpath=//select[@name="questionOf"]  Аукціон
+  Input Text  xpath=//textarea[@ng-model="chatData.message"]  ${question_data.data.description}
+  Click Element   xpath=//button[@ng-click="sendQuestion()"]
+  Sleep     5
+
+Задати запитання на предмет
+  [Arguments]  ${username}  ${auction_uaid}  ${item_id}  ${question_data}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${auction_uaid}
+  Click Element  xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep  2
+  Click Element  xpath=//button[@ng-click="askQuestion()"]
+  Sleep  2
+  Input Text  xpath=//input[@ng-model="chatData.title"]  ${question_data.data.title}
+  Select From List By Label  xpath=//select[@name="questionOf"]  Предмет аукціону
+  Sleep     2
+  ${item_name}=  Get text  xpath=//option[contains(text(), '${item_id}')]
+  Select From List By Label  xpath=//select[@name="relatedItem"]  ${item_name}
+  Input Text      xpath=//textarea[@ng-model="chatData.message"]   ${question_data.data.description}
+  Click Element   xpath=//button[@ng-click="sendQuestion()"]
+  Sleep  5
+
+Відповісти на запитання
+  [Arguments]  ${username}  ${tender_uaid}  ${answer_data}  ${question_id}
+  Sleep  10
+  Reload Page
+  Click Element  xpath=//a[@ui-sref="tenderView.chat"]
+  ${answer_row}=  Get Webelement  xpath=//div[@class="col-xs-10 col-sm-10"][contains(., '${question_id}')]
+  Focus  ${answer_row}
+  Mouse Over  ${answer_row}    # should show answer btn
+  Sleep  1
+  Click Element  xpath=//div[@class="answer mouseenter"]
+  Sleep  1
+  Input Text  xpath=//textarea[@ng-model="chatData.message"]  ${answer_data.data.answer}
+  Click Element  xpath=//button[@ng-click="sendAnswer()"]
+  Sleep  2
+
+Скасувати закупівлю
+  [Arguments]  ${username}  ${tender_uaid}  ${cancellation_reason}  ${document}  ${description}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Focus  xpath=//button[@id="cancel-tender-btn"]
+  Click Element  xpath=//button[@id="cancel-tender-btn"]
+  Sleep  2
+  Select From List By Value  xpath=//select[@id="cancel-reason"]  ${cancellation_reason}
+  Execute Javascript  $('span[class="attach-title ng-binding"]').click()
+  Sleep  1
+  Choose File  xpath=//input[@type="file"]  ${document}
+  Sleep  2
+  Input Text  xpath=//textarea[@id="document-description"]  ${description}
+  Click Element  xpath=//div[@ng-click="delete()"]
+  Sleep  15
+  Reload Page
+
+Подати цінову пропозицію
+  [Arguments]  ${username}  ${auction_uaid}  ${bid}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${auction_uaid}
+  Click Element  xpath=//button[@ng-click='placeBid()']
+  Sleep  2
+  ${amount}=  Convert To String  ${bid.data.value.amount}
+  Input Text  xpath=//input[@name="amount"]  ${amount}
+  Click Element  xpath=//input[@name="agree"]
+  Run Keyword If  'Можливість' in '${TEST NAME}'  Click Element  xpath=//input[@name="bid-valid"]
+  Click Element  xpath=//button[@ng-click="placeBid()"]
+  Sleep  2
+  ${resp}=  Run Keyword If  'Неможливість' in '${TEST NAME}'  newtend.Скасувати невалідну ставку
+  ${resp}=  Run Keyword If  'Можливість' in '${TEST NAME}'  Get text  xpath=//h3[@class="ng-binding"]
+  [Return]  ${resp}
+
+Змінити цінову пропозицію
+  [Arguments]  ${username}  ${tender_uaid}  ${fieldname}  ${fieldvalue}
+  Reload Page
+  Sleep   2
+  Click Element  xpath=//button[@ng-click="placeBid()"]
+  Sleep  1
+  Clear Element Text  xpath=//input[@name="amount"]
+  ${value}=  Convert To String  ${fieldvalue}
+  Input Text  xpath=//input[@name="amount"]  ${value}
+  Click Element  xpath=//input[@name="bid-valid"]
+  Click Element  xpath=//button[@ng-click="changeBid()"]
+  Sleep  2
+
+Скасувати цінову пропозицію
+  [Arguments]  ${username}  ${auction_uaid}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${auction_uaid}
+  Click Element  xpath=//a[@ng-click="cancelBid()"]
+  Wait Until Page Contains Element  xpath=//div[@ng-if="isCancel"]  5
+  Click Element  xpath=//button[@ng-click="cancelBid()"]
+  Sleep  3
+
+Завантажити документ в ставку
+  [Arguments]  ${username}  ${filePath}  ${tender_uaid}
+  Click Element  xpath=//a[@ui-sref="tenderView.documents"]
+  Sleep  2
+  Click Element  xpath=//button[@ng-click="uploadDocument()"]
+  Sleep  1
+  Select From List By Value  xpath=//select[@id="documentType"]  commercialProposal
+  Execute Javascript  $('button[ng-file-select=""]').click()
+  Sleep  2
+  Choose File  xpath=//input[@type="file"]  ${filePath}
+  Sleep  1
+  Click Element  xpath=//button[@ng-click="upload()"]
+  Sleep  7
+  Reload Page
+
+Отримати посилання на аукціон для учасника
+  [Arguments]  ${username}  ${tender_uaid}
+  Reload Page
+  ${result}=  newtend.Отримати посилання
+  [Return]  ${result}
+
+Отримати посилання на аукціон для глядача
+  [Arguments]  ${username}  ${tender_uaid}
+  Reload Page
+  Sleep  2
+  Click Element     xpath=//a[@ui-sref="tenderView.auction"]
+  ${result}=  newtend.Отримати посилання
+  [Return]  ${result}
+
+Отримати посилання
+  Sleep  2
+  : FOR  ${INDEX}  IN RANGE  1  50
+  \  Log To Console  -x  no_newline=true
+  \  ${count}=  Get Matching Xpath Count  xpath=//a[@class="auction-link ng-binding"]
+  \  ${link}=  Get Element Attribute  xpath=//a[@target="_blank"]@href
+  \  Exit For Loop If  '${count}' > '0' and '${link}' != 'None'
+  \  Sleep  30
+  \  Reload Page
+  Wait Until Page Contains Element  xpath=//a[@class="auction-link ng-binding"]  10
+  ${result}=  Get Element Attribute  xpath=//a[@target="_blank"]@href
+  ${result}=  Convert To String  ${result}
+  [Return]  ${result}
+
+# Info procedure
+Отримати інформацію із тендера
+  [Arguments]  ${username}  ${tender_uaid}  ${field}
+  Run Keyword And Return  Отримати інформацію із тендера про ${field}
+
+Отримати інформацію із тендера про auctionID
+  Run Keyword If  '${ROLE}' != 'tender_owner'  Run Keyword And Return  Get Text  xpath=//div[@class='title']//a
+  Run Keyword If  '${ROLE}' == 'tender_owner'  Run Keyword And Return  Get Text  xpath=(//div[@class='title']//span)[1]
+
+Отримати інформацію із тендера про procurementMethodType
+  Run Keyword And Return  Get Text  xpath=//div[@class='title']//span[@class='ng-binding']
+
+Отримати інформацію із тендера про status
+  Reload Page
+  Sleep  2
+  ${text}=  Get Text  xpath=//div[@class='right']//span[@class='status ng-binding']
+  Run Keyword And Return  convert_nt_string_to_ssp_string  ${text}
+
+Отримати інформацію із тендера про title
+  Run Keyword And Return  Get Text  id=view-tender-title
+
+Отримати інформацію із тендера про description
+  Run Keyword And Return  Get Text  id=view-tender-description
+
+Отримати інформацію із тендера про minNumberOfQualifiedBids
+  ${value}=  Get Text  id=min-number-of-qualified-bids
+  Run Keyword And Return  Convert To Number  ${value}
+
+Отримати інформацію із тендера про procuringEntity.name
+  Run Keyword And Return  Get Text  id=view-customer-name
+
+Отримати інформацію із тендера про value.amount
+  ${value}=  Get Text  id=view-tender-value
+  Run Keyword And Return  Convert To Number  ${value}
+
+Отримати інформацію із тендера про minimalStep.amount
+  ${value}=  Get Text  id=step
+  Run Keyword And Return  Convert To Number  ${value}
+
+Отримати інформацію із тендера про guarantee.amount
+  ${value}=  Get Text  id=summ
+  Run Keyword And Return  Convert To Number  ${value}
+
+Отримати інформацію із тендера про registrationFee.amount
+  ${value}=  Get Text  xpath=//div[@id='reg-fee']
+  Run Keyword And Return  Convert To Number  ${value}
+
+Отримати інформацію із тендера про tenderPeriod.endDate
+  ${value}=  Get Text  xpath=//*[@id="end-date-registration"]/span
+  ${date}=  to_iso_date  ${value}
+  [Return]  ${date}
+
+# Info item procedure
+Отримати інформацію із предмету
+  [Arguments]  ${username}  ${tender_uaid}  ${object_id}  ${field}
+  Run Keyword And Return  Отримати інформацію із предмету про ${field}  ${object_id}
+
+Отримати інформацію із предмету про description
+  [Arguments]  ${item}
+  Run Keyword And Return  Get Text  xpath=//div[@ng-bind='item.description'][(contains(text(), '${item}'))]
+
+Отримати інформацію із предмету про unit.name
+  [Arguments]  ${item}
+  Run Keyword And Return  Get Text  xpath=//div[@ng-repeat='item in tender.items track by $index'][contains(., '${item}')]//span[@class='unit ng-binding']
+
+Отримати інформацію із предмету про quantity
+  [Arguments]  ${item}
+  ${value}=  Get Text  xpath=//div[@ng-repeat='item in tender.items track by $index'][contains(., '${item}')]//div[contains(@id, 'quantity')]
+  Run Keyword And Return  Convert To Number  ${value}
+
+# Info question procedure
+Отримати інформацію із запитання
+  [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field_name}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Click Element  xpath=//a[@ui-sref="tenderView.chat"]
+  Sleep  2
+  ${xpath}=  get_xpath_question  ${question_id}  ${field_name}
+  Run Keyword And Return  Get Text  ${xpath}
+
+# Info bids procedure
+Отримати інформацію із пропозиції
+  [Arguments]  ${username}  ${tender_uaid}  ${field}
+  ${text}=  Get Text  xpath=//h3[@class="ng-binding"]
+  ${value}=  Get Substring  ${text}  0  -4
+  Run Keyword And Return  Convert To Number  ${value}
+
+# Info cancellation procedure
+Отримати інформацію із тендера про cancellations[0].status
+  Reload Page
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep  3
+  : FOR     ${INDEX}    IN RANGE    1   15
+  \  ${status}=  Get Text  xpath=//h4[@class="ng-binding"]
+  \  ${return_value}=  convert_Nt_String_To_Common_String  ${status}
+  \  Exit For Loop If  '${return_value}' == 'active'
+  \  Sleep  3
+  \  Reload Page
+  ${staus}=  Get Text  xpath=//h4[@class="ng-binding"]
+  Run Keyword And Return  convert_Nt_String_To_Common_String  ${status}
+
+Отримати інформацію із тендера про cancellations[0].reason
+  ${raw_text}=  Get Webelements  xpath=//div[@class="col-xs-9 ng-binding"]
+  ${text}=  Get Text  ${raw_text[-1]}
+  [Return]  ${text}
+
+Отримати інформацію із документа
+  [Arguments]  ${username}  ${auction_uaid}  ${doc_id}  ${field}
+  Run Keyword And Return  Get Text  xpath=//a[contains(text(), '${doc_id}')]
+
+# Awarding--------------------------------------------------------------------------------------------------------------
+Отримати інформацію із тендера про auctionPeriod.startDate
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep  2
+  : FOR   ${INDEX}   IN RANGE    1    30
+  \  Log To Console   .   no_newline=true
+  \  ${count}=  Get Matching Xpath Count  xpath=//div[@class="ng-binding"]
+  \  ${text}=   Get Text   xpath=//div[@class="ng-binding"]
+  \  Exit For Loop If   '${count}' == '1' and '${text}' != ''
+  \  Sleep  30
+  \  Reload Page
+  ${value}=   Get Text  xpath=//div[@class="ng-binding"]
+  ${return_value}=  to_iso_date  ${value}
+  [Return]  ${return_value}
+
+Отримати інформацію із тендера про auctionPeriod.endDate
+  Switch browser   ${BROWSER_ALIAS}
+  Sleep  2
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep  2
+  : FOR   ${INDEX}   IN RANGE    1    30
+  \  Log To Console   .   no_newline=true
+  \  ${count}=  Get Matching Xpath Count   xpath=//div[@id="auctionEndDate"]
+  \  ${text}=   Get Text   xpath=//div[@id="auctionEndDate"]
+  \  Exit For Loop If  '${count}' == '1' and '${text}' != ''
+  \  Sleep  30
+  \  Reload Page
+  ${value}=  Get Text  xpath=//div[@id="auctionEndDate"]
+  ${return_value}=   to_iso_date   ${value}
+  [Return]  ${return_value}
+
+Отримати інформацію із тендера про awards[${n}].status
+  Reload Page
+  Sleep  2
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep  2
+  : FOR  ${INDEX}  IN RANGE  1  15
+  \  ${status}=  Get Text  id=award-${n}
+  \  @{wait_status}=  wait_status  ${TEST_NAME}
+  \  Exit For Loop If  '${status}' in @{wait_status}
+  \  Sleep  7
+  \  Reload Page
+  \  Sleep     2
+  ${status}=  Get Text  id=award-${n}
+  Run Keyword And Return  convert_nt_string_to_ssp_string  ${status}
+
+Отримати кількість авардів в тендері
+  [Arguments]  ${username}  ${tender_uaid}
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  Sleep  2
+  ${awards_number}=   Get Matching Xpath Count   xpath=//div[@ui-sref='tenderView.bid({bidId: bid.id, lotId: lot.id})']
+  ${awards_number}=  Convert To Integer  ${awards_number}
+  [Return]  ${awards_number}
+
+Скасування рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${tender_uaid}  ${award_num}
+  Reload Page
+  Sleep  2
+  newtend.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Click Element  xpath=//a[@ui-sref="tenderView.auction"]
+  # Squirell in progress
+  : FOR  ${INDEX}  IN RANGE  1  10
+  \  ${looser}=  Get Matching Xpath Count  xpath=//div[@class="col-xs-4 status ng-binding pending-waiting"]
+  \  Log To Console    LOOSERS found - ${looser}
+  \  Exit For Loop If      '${looser}' > '0'
+  \  Sleep  2
+  \  Reload Page
+
+  Sleep  2
+  : FOR  ${INDEX}  IN RANGE  1  10
+  \  Click Element  xpath=//div[@class="col-xs-4 status ng-binding pending-waiting"]
+  \  Sleep  3
+  \  ${take_money_btn}=    Get Matching Xpath Count      xpath=//button[@ng-click="secondCancelAward(bidAward, tender)"]
+  \  Exit For Loop If  '${take_money_btn}' > '0'
+  \  Sleep  2
+  \  Reload Page
+  Click Element  xpath=//button[@ng-click="secondCancelAward(bidAward, tender)"]
+  Sleep  3
+  Wait Until Page Contains Element  xpath=//div[@ng-click="vm.cancel(vm.award, vm.tender)"]
+  Click Element  xpath=//div[@ng-click="vm.cancel(vm.award, vm.tender)"]
+  Sleep  3
+
+# Util_Keywords---------------------------------------------------------------------------------------------------------
 Перейти до редагування
   [Arguments]  ${username}  ${tender_uaid}  ${type}
   Run Keyword If  '${type}' == 'asset'  newtend.Пошук об’єкта МП по ідентифікатору  ${username}  ${tender_uaid}
@@ -1071,3 +1445,11 @@ Edit date auctions
   ${minutes}=  Get Webelements  xpath=//input[@ng-change='updateMinutes()']
   Clear Element Text  ${minutes[-1]}
   Input Text  ${minutes[-1]}  ${fieldvalue.split('T')[1].split(':')[1]}
+
+Скасувати невалідну ставку
+  ${alert}=  Get Matching Xpath Count  xpath=//div[@class="alert alert-warning ng-binding ng-scope"]
+  Click Element  xpath=//a[@ng-click="cancelBid()"]
+  Sleep  2
+  Click Element  xpath=//button[@ng-click="cancelBid()"]
+  ${resp}=  Run Keyword If  '${alert}' == '1'  '${False}'
+  [Return]  ${resp}

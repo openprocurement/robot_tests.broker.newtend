@@ -2,8 +2,8 @@
 
 from datetime import datetime
 from pytz import timezone
-# from iso8601 import parse_date
-# from op_robot_tests.tests_files.service_keywords import get_now
+from iso8601 import parse_date
+from op_robot_tests.tests_files.service_keywords import get_now
 from calendar import monthrange
 import urllib
 
